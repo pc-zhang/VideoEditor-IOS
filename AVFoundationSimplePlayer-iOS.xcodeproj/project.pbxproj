@@ -14,11 +14,16 @@
 		D27489971B1CD4E00020D82A /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27489961B1CD4E00020D82A /* PlayerView.swift */; };
 		D274899C1B1CD4EB0020D82A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D27489981B1CD4EB0020D82A /* Localizable.strings */; };
 		F02B66D920C1020700E879FE /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F02B66D820C1020700E879FE /* TimelineView.swift */; };
+		F02DCFEE20C12D4C0080E5B5 /* wallstreet.mov in Resources */ = {isa = PBXBuildFile; fileRef = F02DCFED20C12D4C0080E5B5 /* wallstreet.mov */; };
 		F06132E020BC4DEE000039B4 /* fullscreen.PNG in Resources */ = {isa = PBXBuildFile; fileRef = F06132DF20BC4DEE000039B4 /* fullscreen.PNG */; };
 		F06132E320BC59B4000039B4 /* pausebutton.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E120BC59B3000039B4 /* pausebutton.png */; };
 		F06132E420BC59B4000039B4 /* playbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E220BC59B4000039B4 /* playbutton.png */; };
 		F06132E620BC6215000039B4 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E520BC6215000039B4 /* background.png */; };
 		F06132F520BD444B000039B4 /* AAPLMovieMutator.m in Sources */ = {isa = PBXBuildFile; fileRef = F06132F120BD444B000039B4 /* AAPLMovieMutator.m */; };
+		F078681B20C15B4C00861244 /* APLViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F078681520C15B4A00861244 /* APLViewController.m */; };
+		F078681C20C15B4C00861244 /* APLCompositionDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = F078681720C15B4B00861244 /* APLCompositionDebugView.m */; };
+		F078681D20C15B4C00861244 /* APLSimpleEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = F078681820C15B4B00861244 /* APLSimpleEditor.m */; };
+		F078681F20C15BA300861244 /* CompositionDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F078681E20C15BA300861244 /* CompositionDebugView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +37,7 @@
 		D27489991B1CD4EB0020D82A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D2CF22151B1E5E970006C864 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		F02B66D820C1020700E879FE /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		F02DCFED20C12D4C0080E5B5 /* wallstreet.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = wallstreet.mov; sourceTree = "<group>"; };
 		F06132DF20BC4DEE000039B4 /* fullscreen.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullscreen.PNG; sourceTree = "<group>"; };
 		F06132E120BC59B3000039B4 /* pausebutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pausebutton.png; sourceTree = "<group>"; };
 		F06132E220BC59B4000039B4 /* playbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playbutton.png; sourceTree = "<group>"; };
@@ -39,6 +45,13 @@
 		F06132E920BD4448000039B4 /* AVFoundationSimplePlayer-iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVFoundationSimplePlayer-iOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		F06132EC20BD444A000039B4 /* AAPLMovieMutator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AAPLMovieMutator.h; sourceTree = "<group>"; };
 		F06132F120BD444B000039B4 /* AAPLMovieMutator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AAPLMovieMutator.m; sourceTree = "<group>"; };
+		F078681520C15B4A00861244 /* APLViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLViewController.m; sourceTree = "<group>"; };
+		F078681620C15B4A00861244 /* APLCompositionDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLCompositionDebugView.h; sourceTree = "<group>"; };
+		F078681720C15B4B00861244 /* APLCompositionDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLCompositionDebugView.m; sourceTree = "<group>"; };
+		F078681820C15B4B00861244 /* APLSimpleEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLSimpleEditor.m; sourceTree = "<group>"; };
+		F078681920C15B4C00861244 /* APLViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLViewController.h; sourceTree = "<group>"; };
+		F078681A20C15B4C00861244 /* APLSimpleEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLSimpleEditor.h; sourceTree = "<group>"; };
+		F078681E20C15BA300861244 /* CompositionDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionDebugView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,13 +85,21 @@
 		D2385B441AF5181400DC8ADE /* AVFoundationSimplePlayer-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				F06132BC20BC1D02000039B4 /* VEResource */,
+				F078681620C15B4A00861244 /* APLCompositionDebugView.h */,
+				F078681720C15B4B00861244 /* APLCompositionDebugView.m */,
+				F078681A20C15B4C00861244 /* APLSimpleEditor.h */,
+				F078681820C15B4B00861244 /* APLSimpleEditor.m */,
+				F078681920C15B4C00861244 /* APLViewController.h */,
+				F078681520C15B4A00861244 /* APLViewController.m */,
+				F02DCFED20C12D4C0080E5B5 /* wallstreet.mov */,
 				F06132EC20BD444A000039B4 /* AAPLMovieMutator.h */,
 				F06132F120BD444B000039B4 /* AAPLMovieMutator.m */,
-				F06132BC20BC1D02000039B4 /* VEResource */,
 				D2385B451AF5181400DC8ADE /* AppDelegate.swift */,
 				D20EB3C11AF94FDE0059CD72 /* PlayerViewController.swift */,
 				D27489961B1CD4E00020D82A /* PlayerView.swift */,
 				F02B66D820C1020700E879FE /* TimelineView.swift */,
+				F078681E20C15BA300861244 /* CompositionDebugView.swift */,
 				D2385B491AF5181400DC8ADE /* Main.storyboard */,
 				D2385B4C1AF5181400DC8ADE /* Images.xcassets */,
 				D2385B511AF5181400DC8ADE /* Info.plist */,
@@ -158,6 +179,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F02DCFEE20C12D4C0080E5B5 /* wallstreet.mov in Resources */,
 				D274899C1B1CD4EB0020D82A /* Localizable.strings in Resources */,
 				F06132E420BC59B4000039B4 /* playbutton.png in Resources */,
 				F06132E620BC6215000039B4 /* background.png in Resources */,
@@ -177,8 +199,12 @@
 			files = (
 				D27489971B1CD4E00020D82A /* PlayerView.swift in Sources */,
 				F02B66D920C1020700E879FE /* TimelineView.swift in Sources */,
+				F078681D20C15B4C00861244 /* APLSimpleEditor.m in Sources */,
 				D2385B461AF5181400DC8ADE /* AppDelegate.swift in Sources */,
+				F078681C20C15B4C00861244 /* APLCompositionDebugView.m in Sources */,
 				D20EB3C21AF94FDE0059CD72 /* PlayerViewController.swift in Sources */,
+				F078681B20C15B4C00861244 /* APLViewController.m in Sources */,
+				F078681F20C15BA300861244 /* CompositionDebugView.swift in Sources */,
 				F06132F520BD444B000039B4 /* AAPLMovieMutator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

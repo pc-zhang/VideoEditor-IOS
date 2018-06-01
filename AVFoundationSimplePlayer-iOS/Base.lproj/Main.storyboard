@@ -60,10 +60,16 @@
                                     <outletCollection property="gestureRecognizers" destination="eOt-vD-jk5" appends="YES" id="8K0-nJ-1KP"/>
                                 </connections>
                             </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YQ-cI-V47" userLabel="Composition Debug View" customClass="APLCompositionDebugView">
+                                <rect key="frame" x="16" y="631" width="343" height="165"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <connections>
+                        <outlet property="compositionDebugView" destination="3YQ-cI-V47" id="Ise-KJ-Ch0"/>
                         <outlet property="playPauseButton" destination="QbW-EF-KSG" id="qre-VR-677"/>
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>
                         <outlet property="startTimeLabel" destination="TCk-BI-d4f" id="s5B-ja-H8I"/>

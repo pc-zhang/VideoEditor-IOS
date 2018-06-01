@@ -44,6 +44,17 @@ class PlayerViewController: UIViewController {
             piece.layer.position.x = self.initialPos + translation.x
             
             self.currentTime = initialTime - Double(translation.x) / Double(piece.layer.frame.width) * CMTimeGetSeconds(self.asset!.duration)
+            
+            self.timeline.layer.removeAllAnimations()
+            let v = gestureRecognizer.velocity(in: piece).x
+            UIView.animate(withDuration: CMTimeGetSeconds((self.asset?.duration)!)) {
+                if v < 0 {
+                    // Change the opacity implicitly.
+                    self.timeline.layer.position.x = self.timeline.layer.position.x - CGFloat(0.01 * v * v)
+                } else {
+                    self.timeline.layer.position.x = self.timeline.layer.position.x + CGFloat(0.01 * v * v)
+                }
+            }
         }
         else {
             // On cancellation, return the piece to its original location.
@@ -138,7 +149,8 @@ class PlayerViewController: UIViewController {
 //    @IBOutlet weak var fastForwardButton: UIButton!
     @IBOutlet weak var playerView: PlayerView!
     @IBOutlet weak var timeline: TimelineView!
-
+    @IBOutlet weak var compositionDebugView: APLCompositionDebugView!
+    
     // MARK: - View Controller
     
     override func viewWillAppear(_ animated: Bool) {
@@ -170,6 +182,8 @@ class PlayerViewController: UIViewController {
         
         // update timeline
         updateMovieTimeline()
+        
+        compositionDebugView.synchronize(to: nil, videoComposition: nil, audioMix: nil)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
