@@ -61,17 +61,44 @@
                                 </connections>
                             </view>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YQ-cI-V47" userLabel="Composition Debug View" customClass="APLCompositionDebugView">
-                                <rect key="frame" x="16" y="631" width="343" height="165"/>
+                                <rect key="frame" x="16" y="34" width="343" height="125"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vtc-x5-voD" userLabel="Remove Button">
+                                <rect key="frame" x="329" y="715" width="24" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="remove.png"/>
+                                <connections>
+                                    <action selector="removeClip:" destination="BYZ-38-t0r" eventType="touchUpInside" id="LfL-hK-O4Z"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SV9-cG-1eW" userLabel="Copy Button">
+                                <rect key="frame" x="257" y="715" width="24" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="copy.png"/>
+                                <connections>
+                                    <action selector="copyClip:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Al9-NG-8ae"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E8x-Q2-wzR" userLabel="Split Button">
+                                <rect key="frame" x="185" y="715" width="24" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="split.png"/>
+                                <connections>
+                                    <action selector="splitClip:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dfY-Mq-hTH"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <connections>
                         <outlet property="compositionDebugView" destination="3YQ-cI-V47" id="Ise-KJ-Ch0"/>
+                        <outlet property="copyButton" destination="SV9-cG-1eW" id="gTU-ag-yzK"/>
                         <outlet property="playPauseButton" destination="QbW-EF-KSG" id="qre-VR-677"/>
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>
+                        <outlet property="removeButton" destination="vtc-x5-voD" id="WH8-G8-57F"/>
+                        <outlet property="splitButton" destination="E8x-Q2-wzR" id="GO1-ry-AZm"/>
                         <outlet property="startTimeLabel" destination="TCk-BI-d4f" id="s5B-ja-H8I"/>
                         <outlet property="timeline" destination="VLA-PF-YHN" id="G7A-3r-Bz4"/>
                         <outlet property="view" destination="8bC-Xf-vdC" id="lHD-q6-68G"/>
@@ -94,7 +121,10 @@
     </scenes>
     <resources>
         <image name="background.png" width="1125" height="2436"/>
+        <image name="copy.png" width="70" height="140"/>
         <image name="fullscreen.PNG" width="47" height="55"/>
         <image name="playbutton.png" width="49" height="56"/>
+        <image name="remove.png" width="71" height="138"/>
+        <image name="split.png" width="71" height="140"/>
     </resources>
 </document>

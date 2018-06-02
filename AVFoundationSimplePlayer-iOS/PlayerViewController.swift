@@ -105,6 +105,10 @@ class PlayerViewController: UIViewController {
     @IBOutlet weak var timeline: TimelineView!
     @IBOutlet weak var compositionDebugView: APLCompositionDebugView!
     
+    @IBOutlet weak var splitButton: UIButton!
+    @IBOutlet weak var copyButton: UIButton!
+    @IBOutlet weak var removeButton: UIButton!
+    
     // MARK: - View Controller
     
     override func viewWillAppear(_ animated: Bool) {
@@ -300,6 +304,13 @@ class PlayerViewController: UIViewController {
     }
     
     // MARK: - IBActions
+    
+    @IBAction func splitClip(_ sender: Any) {
+    }
+    @IBAction func copyClip(_ sender: Any) {
+    }
+    @IBAction func removeClip(_ sender: Any) {
+    }
     
     @IBAction func playPauseButtonWasPressed(_ sender: UIButton) {
         if player.rate != 1.0 {
