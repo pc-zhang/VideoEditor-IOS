@@ -123,7 +123,7 @@ class PlayerViewController: UIViewController {
         
         playerView.playerLayer.player = player
         
-        let movieURL = Bundle.main.url(forResource: "wallstreet", withExtension: "mov")!
+        let movieURL = Bundle.main.url(forResource: "wallstreet", withExtension: "m4v")!
         asset = AVURLAsset(url: movieURL, options: nil)
         
         // Make sure we don't have a strong reference cycle by only capturing self as weak.
@@ -145,8 +145,6 @@ class PlayerViewController: UIViewController {
         
         // update timeline
         updateMovieTimeline()
-        
-        compositionDebugView.synchronize(to: composition, videoComposition: nil, audioMix: nil)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -273,32 +271,29 @@ class PlayerViewController: UIViewController {
                  We can play this asset. Create a new `AVPlayerItem` and make
                  it our player's current item.
                  */
-                self.asset = newAsset
-                
                 let nextClipStartTime: CMTime = kCMTimeZero
 
                 let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, newAsset.duration);
                 
-                guard let clipVideoTrack = newAsset.tracks(withMediaType: AVMediaTypeVideo).first else{
-                    return
-                }
+                let clipVideoTrack = newAsset.tracks(withMediaType: AVMediaTypeVideo).first!
                 
                 let compositionVideoTrack = self.composition!.mutableTrack(compatibleWith: clipVideoTrack)
                 
-                try! compositionVideoTrack?.insertTimeRange(timeRangeInAsset, of: clipVideoTrack, at: nextClipStartTime)
+                try! compositionVideoTrack!.insertTimeRange(timeRangeInAsset, of: clipVideoTrack, at: nextClipStartTime)
                 
-                guard let clipAudioTrack = newAsset.tracks(withMediaType: AVMediaTypeAudio).first else{
-                    return
-                }
+                let clipAudioTrack = newAsset.tracks(withMediaType: AVMediaTypeAudio).first!
                 
                 let compositionAudioTrack = self.composition!.mutableTrack(compatibleWith: clipAudioTrack)
                 
-                try! compositionAudioTrack?.insertTimeRange(timeRangeInAsset, of: clipAudioTrack, at: nextClipStartTime)
+                try! compositionAudioTrack!.insertTimeRange(timeRangeInAsset, of: clipAudioTrack, at: nextClipStartTime)
                 
                 self.playerItem = AVPlayerItem(asset: self.composition!)
                 self.playerItem!.videoComposition = self.videoComposition
                 self.playerItem!.audioMix = self.audioMix
                 self.player.replaceCurrentItem(with: self.playerItem)
+                
+                self.compositionDebugView.player = self.player
+                self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
             }
         }
     }
