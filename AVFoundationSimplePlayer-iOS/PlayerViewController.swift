@@ -21,48 +21,6 @@ class PlayerViewController: UIViewController {
     var initialPos = CGFloat()  // The initial center point of the view.
     var initialTime = Double()
     
-    @IBAction func timelineTap(_ sender: UITapGestureRecognizer) {
-        
-    }
-    
-    @IBAction func timelineDrag(_ gestureRecognizer : UIPanGestureRecognizer) {
-        guard gestureRecognizer.view != nil else {return}
-//        playPauseButtonWasPressed()
-        let piece = gestureRecognizer.view!
-        // Get the changes in the X and Y directions relative to
-        // the superview's coordinate space.
-        let translation = gestureRecognizer.translation(in: piece.superview)
-        if gestureRecognizer.state == .began {
-            
-            // Save the view's original position.
-            self.initialPos = piece.layer.position.x
-            self.initialTime = self.currentTime
-        }
-        // Update the position for the .began, .changed, and .ended states
-        if gestureRecognizer.state != .cancelled {
-            // Add the X and Y translation to the view's original position.
-            piece.layer.position.x = self.initialPos + translation.x
-            
-            self.currentTime = initialTime - Double(translation.x) / Double(piece.layer.frame.width) * CMTimeGetSeconds(self.asset!.duration)
-            
-            self.timeline.layer.removeAllAnimations()
-            let v = gestureRecognizer.velocity(in: piece).x
-            UIView.animate(withDuration: CMTimeGetSeconds((self.asset?.duration)!)) {
-                if v < 0 {
-                    // Change the opacity implicitly.
-                    self.timeline.layer.position.x = self.timeline.layer.position.x - CGFloat(0.01 * v * v)
-                } else {
-                    self.timeline.layer.position.x = self.timeline.layer.position.x + CGFloat(0.01 * v * v)
-                }
-            }
-        }
-        else {
-            // On cancellation, return the piece to its original location.
-            piece.layer.position.x = initialPos
-            self.currentTime = initialTime
-        }
-    }
-    
     // Attempt load and test these asset keys before playing.
     static let assetKeysRequiredToPlay = [
         "playable",
@@ -107,6 +65,10 @@ class PlayerViewController: UIViewController {
         }
     }
     
+    var composition: AVMutableComposition? = nil
+    var videoComposition: AVMutableVideoComposition? = nil
+    var audioMix: AVMutableAudioMix? = nil
+    
     private var playerLayer: AVPlayerLayer? {
         return playerView.playerLayer
     }
@@ -129,15 +91,7 @@ class PlayerViewController: UIViewController {
      */
     private var timeObserverToken: Any?
     
-    private var playerItem: AVPlayerItem? = nil {
-        didSet {
-            /*
-             If needed, configure player item here before associating it with a player.
-             (example: adding outputs, setting text style rules, selecting media options)
-             */
-            player.replaceCurrentItem(with: self.playerItem)
-        }
-    }
+    private var playerItem: AVPlayerItem? = nil
     
     // MARK: - IBOutlets
     
@@ -180,10 +134,19 @@ class PlayerViewController: UIViewController {
             self.startTimeLabel.text = self.createTimeString(time: timeElapsed)
         }
         
+        // add composition
+        
+        composition = AVMutableComposition()
+        // Add two video tracks and two audio tracks.
+        let compositionVideoTrack: AVMutableCompositionTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
+        
+        let compositionAudioTrack: AVMutableCompositionTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        
+        
         // update timeline
         updateMovieTimeline()
         
-        compositionDebugView.synchronize(to: nil, videoComposition: nil, audioMix: nil)
+        compositionDebugView.synchronize(to: composition, videoComposition: nil, audioMix: nil)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -310,7 +273,32 @@ class PlayerViewController: UIViewController {
                  We can play this asset. Create a new `AVPlayerItem` and make
                  it our player's current item.
                  */
-                self.playerItem = AVPlayerItem(asset: newAsset)
+                self.asset = newAsset
+                
+                let nextClipStartTime: CMTime = kCMTimeZero
+
+                let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, newAsset.duration);
+                
+                guard let clipVideoTrack = newAsset.tracks(withMediaType: AVMediaTypeVideo).first else{
+                    return
+                }
+                
+                let compositionVideoTrack = self.composition!.mutableTrack(compatibleWith: clipVideoTrack)
+                
+                try! compositionVideoTrack?.insertTimeRange(timeRangeInAsset, of: clipVideoTrack, at: nextClipStartTime)
+                
+                guard let clipAudioTrack = newAsset.tracks(withMediaType: AVMediaTypeAudio).first else{
+                    return
+                }
+                
+                let compositionAudioTrack = self.composition!.mutableTrack(compatibleWith: clipAudioTrack)
+                
+                try! compositionAudioTrack?.insertTimeRange(timeRangeInAsset, of: clipAudioTrack, at: nextClipStartTime)
+                
+                self.playerItem = AVPlayerItem(asset: self.composition!)
+                self.playerItem!.videoComposition = self.videoComposition
+                self.playerItem!.audioMix = self.audioMix
+                self.player.replaceCurrentItem(with: self.playerItem)
             }
         }
     }
@@ -356,6 +344,49 @@ class PlayerViewController: UIViewController {
     
     @IBAction func timeSliderDidChange(_ sender: UISlider) {
         currentTime = Double(sender.value)
+    }
+    
+    
+    @IBAction func timelineTap(_ sender: UITapGestureRecognizer) {
+        
+    }
+    
+    @IBAction func timelineDrag(_ gestureRecognizer : UIPanGestureRecognizer) {
+        guard gestureRecognizer.view != nil else {return}
+        //        playPauseButtonWasPressed()
+        let piece = gestureRecognizer.view!
+        // Get the changes in the X and Y directions relative to
+        // the superview's coordinate space.
+        let translation = gestureRecognizer.translation(in: piece.superview)
+        if gestureRecognizer.state == .began {
+            
+            // Save the view's original position.
+            self.initialPos = piece.layer.position.x
+            self.initialTime = self.currentTime
+        }
+        // Update the position for the .began, .changed, and .ended states
+        if gestureRecognizer.state != .cancelled {
+            // Add the X and Y translation to the view's original position.
+            piece.layer.position.x = self.initialPos + translation.x
+            
+            self.currentTime = initialTime - Double(translation.x) / Double(piece.layer.frame.width) * CMTimeGetSeconds(self.asset!.duration)
+            
+            self.timeline.layer.removeAllAnimations()
+            let v = gestureRecognizer.velocity(in: piece).x
+            UIView.animate(withDuration: CMTimeGetSeconds((self.asset?.duration)!)) {
+                if v < 0 {
+                    // Change the opacity implicitly.
+                    self.timeline.layer.position.x = self.timeline.layer.position.x - CGFloat(0.01 * v * v)
+                } else {
+                    self.timeline.layer.position.x = self.timeline.layer.position.x + CGFloat(0.01 * v * v)
+                }
+            }
+        }
+        else {
+            // On cancellation, return the piece to its original location.
+            piece.layer.position.x = initialPos
+            self.currentTime = initialTime
+        }
     }
     
     // MARK: - KVO Observation
