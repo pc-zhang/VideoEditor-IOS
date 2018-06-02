@@ -275,21 +275,9 @@ class PlayerViewController: UIViewController {
                  We can play this asset. Create a new `AVPlayerItem` and make
                  it our player's current item.
                  */
-                let nextClipStartTime: CMTime = kCMTimeZero
-
                 let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, newAsset.duration);
                 
-                let clipVideoTrack = newAsset.tracks(withMediaType: AVMediaTypeVideo).first!
-                
-                let compositionVideoTrack = self.composition!.mutableTrack(compatibleWith: clipVideoTrack)
-                
-                try! compositionVideoTrack!.insertTimeRange(timeRangeInAsset, of: clipVideoTrack, at: nextClipStartTime)
-                
-                let clipAudioTrack = newAsset.tracks(withMediaType: AVMediaTypeAudio).first!
-                
-                let compositionAudioTrack = self.composition!.mutableTrack(compatibleWith: clipAudioTrack)
-                
-                try! compositionAudioTrack!.insertTimeRange(timeRangeInAsset, of: clipAudioTrack, at: nextClipStartTime)
+                try! self.composition!.insertTimeRange(timeRangeInAsset, of: newAsset, at: kCMTimeZero)
                 
                 self.playerItem = AVPlayerItem(asset: self.composition!)
                 self.playerItem!.videoComposition = self.videoComposition
@@ -306,10 +294,38 @@ class PlayerViewController: UIViewController {
     // MARK: - IBActions
     
     @IBAction func splitClip(_ sender: Any) {
+        // Trim to half duration
+        let halfDuration = CMTimeGetSeconds(self.composition!.duration)/2.0
+        let trimmedDuration = CMTimeMakeWithSeconds(halfDuration, 1)
+        // Check if a composition already exists, i.e., another tool has been applied
+        
+        // Remove the second half of the existing composition to trim
+        self.composition!.removeTimeRange(CMTimeRangeMake(trimmedDuration, self.composition!.duration))
+        
+        self.compositionDebugView.player = self.player
+        self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
+        self.compositionDebugView.setNeedsDisplay()
+        
+//        // Notify AVSEDocument class to reload the player view with the changes
+//        [[NSNotificationCenter defaultCenter]
+//            postNotificationName:AVSEReloadNotification
+//            object:self];
     }
     @IBAction func copyClip(_ sender: Any) {
+        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, self.asset!.duration);
+        try! self.composition!.insertTimeRange(timeRangeInAsset, of: self.asset!, at: self.composition!.duration)
+        
+        self.compositionDebugView.player = self.player
+        self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
+        self.compositionDebugView.setNeedsDisplay()
     }
     @IBAction func removeClip(_ sender: Any) {
+        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, self.asset!.duration);
+        self.composition!.removeTimeRange(CMTimeRangeMake(kCMTimeZero, self.asset!.duration))
+        
+        self.compositionDebugView.player = self.player
+        self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
+        self.compositionDebugView.setNeedsDisplay()
     }
     
     @IBAction func playPauseButtonWasPressed(_ sender: UIButton) {
