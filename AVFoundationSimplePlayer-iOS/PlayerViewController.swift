@@ -57,14 +57,6 @@ class PlayerViewController: UIViewController {
         }
     }
     
-    var asset: AVURLAsset? {
-        didSet {
-            guard let newAsset = asset else { return }
-            
-            asynchronouslyLoadURLAsset(newAsset)
-        }
-    }
-    
     var composition: AVMutableComposition? = nil
     var videoComposition: AVMutableVideoComposition? = nil
     var audioMix: AVMutableAudioMix? = nil
@@ -128,7 +120,8 @@ class PlayerViewController: UIViewController {
         playerView.playerLayer.player = player
         
         let movieURL = Bundle.main.url(forResource: "wallstreet", withExtension: "m4v")!
-        asset = AVURLAsset(url: movieURL, options: nil)
+        let asset = AVURLAsset(url: movieURL, options: nil)
+        asynchronouslyLoadURLAsset(asset)
         
         // Make sure we don't have a strong reference cycle by only capturing self as weak.
         let interval = CMTimeMake(1, 1)
@@ -171,9 +164,9 @@ class PlayerViewController: UIViewController {
     // MARK: todo
     
     func imageTimesForNumberOfImages(numberOfImages:UInt) -> [NSValue] {
-        let movieSeconds = CMTimeGetSeconds((asset?.duration)!);
+        let movieSeconds = CMTimeGetSeconds((composition?.duration)!);
         let incrementSeconds = movieSeconds / Double(numberOfImages);
-        let movieDuration = asset?.duration;
+        let movieDuration = composition?.duration;
     
         let incrementTime = CMTimeMakeWithSeconds(incrementSeconds, 1000);
         var times = [NSValue]();
@@ -198,10 +191,10 @@ class PlayerViewController: UIViewController {
         
         let numberOfImagesNeeded = timeline.countOfImagesRequiredToFillView()
         
-        if kCMTimeZero != asset!.duration && (asset?.tracks(withMediaType: AVMediaTypeVideo).count)! > 0 {
+        if kCMTimeZero != composition!.duration && (composition!.tracks(withMediaType: AVMediaTypeVideo).count) > 0 {
             let times = imageTimesForNumberOfImages(numberOfImages: numberOfImagesNeeded)
         
-            let imageGenerator = AVAssetImageGenerator.init(asset: self.asset!)
+            let imageGenerator = AVAssetImageGenerator.init(asset: composition!)
             
             // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
             imageGenerator.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
@@ -238,11 +231,6 @@ class PlayerViewController: UIViewController {
              our handler to the main queue.
              */
             DispatchQueue.main.async {
-                /*
-                 `self.asset` has already changed! No point continuing because
-                 another `newAsset` will come along in a moment.
-                 */
-                guard newAsset == self.asset else { return }
                 
                 /*
                  Test whether the values of each of the keys we need have been
@@ -312,16 +300,16 @@ class PlayerViewController: UIViewController {
 //            object:self];
     }
     @IBAction func copyClip(_ sender: Any) {
-        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, self.asset!.duration);
-        try! self.composition!.insertTimeRange(timeRangeInAsset, of: self.asset!, at: self.composition!.duration)
+        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, composition!.duration);
+        try! self.composition!.insertTimeRange(timeRangeInAsset, of: composition!, at: self.composition!.duration)
         
         self.compositionDebugView.player = self.player
         self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
         self.compositionDebugView.setNeedsDisplay()
     }
     @IBAction func removeClip(_ sender: Any) {
-        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, self.asset!.duration);
-        self.composition!.removeTimeRange(CMTimeRangeMake(kCMTimeZero, self.asset!.duration))
+        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, composition!.duration);
+        self.composition!.removeTimeRange(CMTimeRangeMake(kCMTimeZero, composition!.duration))
         
         self.compositionDebugView.player = self.player
         self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
@@ -339,9 +327,9 @@ class PlayerViewController: UIViewController {
             player.play()
             
             self.timeline.layer.removeAllAnimations()
-            self.timeline.layer.position.x = timeline_original_x + self.timeline.frame.width / 2 - self.timeline.frame.width / CGFloat(CMTimeGetSeconds((self.asset?.duration)!)) * CGFloat(CMTimeGetSeconds(player.currentTime()))
+            self.timeline.layer.position.x = timeline_original_x + self.timeline.frame.width / 2 - self.timeline.frame.width / CGFloat(CMTimeGetSeconds((composition?.duration)!)) * CGFloat(CMTimeGetSeconds(player.currentTime()))
             
-            UIView.animate(withDuration: CMTimeGetSeconds((self.asset?.duration)!)) {
+            UIView.animate(withDuration: CMTimeGetSeconds((composition?.duration)!)) {
                 // Change the opacity implicitly.
                 self.timeline.layer.position.x = self.timeline.layer.position.x - self.timeline.frame.width
             }
@@ -351,7 +339,7 @@ class PlayerViewController: UIViewController {
             player.pause()
             
             self.timeline.layer.removeAllAnimations()
-            self.timeline.layer.position.x = timeline_original_x + self.timeline.frame.width / 2 - self.timeline.frame.width / CGFloat(CMTimeGetSeconds((self.asset?.duration)!)) * CGFloat(CMTimeGetSeconds(player.currentTime()))
+            self.timeline.layer.position.x = timeline_original_x + self.timeline.frame.width / 2 - self.timeline.frame.width / CGFloat(CMTimeGetSeconds((composition?.duration)!)) * CGFloat(CMTimeGetSeconds(player.currentTime()))
         }
     }
     
@@ -392,11 +380,11 @@ class PlayerViewController: UIViewController {
             // Add the X and Y translation to the view's original position.
             piece.layer.position.x = self.initialPos + translation.x
             
-            self.currentTime = initialTime - Double(translation.x) / Double(piece.layer.frame.width) * CMTimeGetSeconds(self.asset!.duration)
+            self.currentTime = initialTime - Double(translation.x) / Double(piece.layer.frame.width) * CMTimeGetSeconds(composition!.duration)
             
             self.timeline.layer.removeAllAnimations()
             let v = gestureRecognizer.velocity(in: piece).x
-            UIView.animate(withDuration: CMTimeGetSeconds((self.asset?.duration)!)) {
+            UIView.animate(withDuration: CMTimeGetSeconds((composition!.duration))) {
                 if v < 0 {
                     // Change the opacity implicitly.
                     self.timeline.layer.position.x = self.timeline.layer.position.x - CGFloat(0.01 * v * v)
