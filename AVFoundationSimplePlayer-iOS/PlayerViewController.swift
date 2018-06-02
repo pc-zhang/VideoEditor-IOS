@@ -381,17 +381,18 @@ class PlayerViewController: UIViewController {
             
             let decVelocityAnim = CAKeyframeAnimation(keyPath: "position.x")
             decVelocityAnim.calculationMode = kCAAnimationCubic
-            if v < 0 {
-                decVelocityAnim.values = [self.timeline.layer.position.x, self.timeline.layer.position.x + CGFloat(0.1*v),
-                    self.timeline.layer.position.x + CGFloat(1.5*v)]
-            } else {
-                decVelocityAnim.values = [self.timeline.layer.position.x, self.timeline.layer.position.x + CGFloat(0.1*v),
-                    self.timeline.layer.position.x + CGFloat(1.5*v)]
-            }
+            let init_x = self.timeline.layer.position.x
+            decVelocityAnim.values = [init_x,
+                                      init_x + CGFloat(0.25*v),
+                                      init_x + CGFloat(0.45*v),
+                                      init_x + CGFloat(0.5*v),
+                                      init_x + CGFloat(0.45*v),
+                                      init_x + CGFloat(1*v),
+                                      init_x + CGFloat(0.25*v),
+                                      init_x]
+            decVelocityAnim.keyTimes = [0,0.2,0.5,1,1.5,1.8,2]
             
-            decVelocityAnim.keyTimes = [0,0.1,3]
-            
-            decVelocityAnim.duration = 3
+            decVelocityAnim.duration = 2.5
             self.timeline.layer.add(decVelocityAnim, forKey: "position.x")
         }
         else {
