@@ -294,6 +294,7 @@ class PlayerViewController: UIViewController {
                 
                 self.compositionDebugView.player = self.player
                 self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
+                self.compositionDebugView.setNeedsDisplay()
             }
         }
     }
