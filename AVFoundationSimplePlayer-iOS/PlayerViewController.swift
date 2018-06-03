@@ -16,10 +16,10 @@ import UIKit
  */
 private var playerViewControllerKVOContext = 0
 
-class PlayerViewController: UIViewController {
+class PlayerViewController: UIViewController, CAAnimationDelegate {
     // MARK: Properties
-    var initialPos = CGFloat()  // The initial center point of the view.
-    var initialTime = Double()
+    var seekTimer: Timer? = nil
+    var initialPos: CGFloat = 0
     
     // Attempt load and test these asset keys before playing.
     static let assetKeysRequiredToPlay = [
@@ -320,12 +320,12 @@ class PlayerViewController: UIViewController {
             player.play()
             
             self.timeline.layer.removeAllAnimations()
-            self.timeline.layer.position.x = timeline_original_x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(player.currentTime())) / 15
+            self.timeline.layer.position.x = timeline_original_x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(player.currentTime())) / CGFloat(CMTimeGetSeconds(self.composition!.duration))
             
             let constVelocityAnim = CAKeyframeAnimation(keyPath: "position.x")
             constVelocityAnim.calculationMode = kCAAnimationCubicPaced
-            constVelocityAnim.values = [self.timeline.layer.position.x, self.timeline.layer.position.x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(self.composition!.duration)) / 15]
-            constVelocityAnim.duration = CMTimeGetSeconds((composition?.duration)!)
+            constVelocityAnim.values = [self.timeline.layer.position.x, self.timeline.layer.position.x - self.timeline.frame.width]
+            constVelocityAnim.duration = CMTimeGetSeconds((composition!.duration))
             self.timeline.layer.add(constVelocityAnim, forKey: "position.x")
         }
         else {
@@ -333,7 +333,7 @@ class PlayerViewController: UIViewController {
             player.pause()
             
             self.timeline.layer.removeAllAnimations()
-            self.timeline.layer.position.x = timeline_original_x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(player.currentTime())) / 15
+            self.timeline.layer.position.x = timeline_original_x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(player.currentTime())) / CGFloat(CMTimeGetSeconds(self.composition!.duration))
         }
     }
     
@@ -366,20 +366,20 @@ class PlayerViewController: UIViewController {
         if gestureRecognizer.state == .began {
             self.timeline.layer.removeAllAnimations()
             // Save the view's original position.
+            
             self.initialPos = piece.layer.position.x
-            self.initialTime = self.currentTime
+            
         }
         // Update the position for the .began, .changed, and .ended states
-        if gestureRecognizer.state != .cancelled {
+        if gestureRecognizer.state != .cancelled && gestureRecognizer.state != .ended {
             // Add the X and Y translation to the view's original position.
             piece.layer.position.x = self.initialPos + translation.x
-            
-            self.currentTime = initialTime - Double(translation.x) / Double(piece.layer.frame.width) * CMTimeGetSeconds(composition!.duration)
-            
-            self.timeline.layer.removeAllAnimations()
+            self.currentTime = Double(self.timeline_original_x - self.timeline.layer.position.x) / Double(self.timeline.layer.frame.width) * CMTimeGetSeconds(self.composition!.duration)
+        }else if gestureRecognizer.state == .ended {
             let v = gestureRecognizer.velocity(in: piece).x
             
             let decVelocityAnim = CAKeyframeAnimation(keyPath: "position.x")
+            decVelocityAnim.delegate = self
             decVelocityAnim.calculationMode = kCAAnimationCubic
             let init_x = self.timeline.layer.position.x
             decVelocityAnim.values = [init_x,
@@ -387,18 +387,24 @@ class PlayerViewController: UIViewController {
                                       init_x + CGFloat(0.45*v),
                                       init_x + CGFloat(0.5*v),
                                       init_x + CGFloat(0.45*v),
-                                      init_x + CGFloat(1*v),
                                       init_x + CGFloat(0.25*v),
                                       init_x]
             decVelocityAnim.keyTimes = [0,0.2,0.5,1,1.5,1.8,2]
             
             decVelocityAnim.duration = 2.5
             self.timeline.layer.add(decVelocityAnim, forKey: "position.x")
+            
+            if #available(iOS 10.0, *) {
+                seekTimer?.invalidate()
+                seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { (timer) in
+                    self.currentTime = Double(self.timeline_original_x - self.timeline.layer.position.x) / Double(self.timeline.layer.frame.width) * CMTimeGetSeconds(self.composition!.duration)
+                })
+            } else {
+                // Fallback on earlier versions
+            }
         }
         else {
             // On cancellation, return the piece to its original location.
-            piece.layer.position.x = initialPos
-            self.currentTime = initialTime
         }
     }
     
@@ -518,6 +524,12 @@ class PlayerViewController: UIViewController {
         components.second = Int(max(0.0, time))
         
         return timeRemainingFormatter.string(from: components as DateComponents)!
+    }
+    
+    // MARK: Delegate
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        self.seekTimer?.invalidate()
     }
 
 }
