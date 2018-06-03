@@ -37,19 +37,16 @@
                                 <color key="textColor" red="0.70588235294117652" green="0.70196078431372544" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mSK-v8-mRG" userLabel="Full Screen">
-                                <rect key="frame" x="329" y="429" width="15" height="18"/>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-PF-YHN" customClass="TimelineView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
+                                <rect key="frame" x="185" y="535" width="190" height="61"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" backgroundImage="fullscreen.PNG"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QbW-EF-KSG" userLabel="Play Pause Button">
-                                <rect key="frame" x="180" y="431" width="12" height="15"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" image="playbutton.png"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <gestureRecognizers/>
                                 <connections>
-                                    <action selector="playPauseButtonWasPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="a3w-zb-4Eh"/>
+                                    <outletCollection property="gestureRecognizers" destination="5qt-4k-GCQ" appends="YES" id="lpe-0c-WY4"/>
+                                    <outletCollection property="gestureRecognizers" destination="eOt-vD-jk5" appends="YES" id="8K0-nJ-1KP"/>
                                 </connections>
-                            </button>
+                            </view>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YQ-cI-V47" userLabel="Composition Debug View" customClass="APLCompositionDebugView">
                                 <rect key="frame" x="16" y="34" width="343" height="125"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -79,23 +76,28 @@
                                     <action selector="splitClip:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dfY-Mq-hTH"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-PF-YHN" customClass="TimelineView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
-                                <rect key="frame" x="185" y="535" width="190" height="61"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oXx-Rg-8cj" userLabel="Play Pause Button">
+                                <rect key="frame" x="160" y="411" width="54" height="55"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <gestureRecognizers/>
+                                <inset key="imageEdgeInsets" minX="20" minY="20" maxX="20" maxY="20"/>
+                                <state key="normal" image="playbutton.png"/>
                                 <connections>
-                                    <outletCollection property="gestureRecognizers" destination="5qt-4k-GCQ" appends="YES" id="lpe-0c-WY4"/>
-                                    <outletCollection property="gestureRecognizers" destination="eOt-vD-jk5" appends="YES" id="8K0-nJ-1KP"/>
+                                    <action selector="playPauseButtonWasPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dUV-a0-X9G"/>
                                 </connections>
-                            </view>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eAq-ZF-FTo" userLabel="Full Screen">
+                                <rect key="frame" x="309" y="409" width="55" height="58"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <inset key="imageEdgeInsets" minX="20" minY="20" maxX="20" maxY="20"/>
+                                <state key="normal" image="fullscreen.PNG"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <connections>
                         <outlet property="compositionDebugView" destination="3YQ-cI-V47" id="Ise-KJ-Ch0"/>
                         <outlet property="copyButton" destination="SV9-cG-1eW" id="gTU-ag-yzK"/>
-                        <outlet property="playPauseButton" destination="QbW-EF-KSG" id="qre-VR-677"/>
+                        <outlet property="playPauseButton" destination="oXx-Rg-8cj" id="cVr-Vl-Xgy"/>
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>
                         <outlet property="removeButton" destination="vtc-x5-voD" id="WH8-G8-57F"/>
                         <outlet property="splitButton" destination="E8x-Q2-wzR" id="GO1-ry-AZm"/>

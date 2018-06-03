@@ -20,6 +20,8 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     // MARK: Properties
     var seekTimer: Timer? = nil
     var initialPos: CGFloat = 0
+    var compositionVideoTrack: AVMutableCompositionTrack? = nil
+    var compositionAudioTrack: AVMutableCompositionTrack? = nil
     
     // Attempt load and test these asset keys before playing.
     static let assetKeysRequiredToPlay = [
@@ -131,13 +133,15 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
             self.startTimeLabel.text = self.createTimeString(time: timeElapsed)
         }
         
+        timeline_original_x = self.timeline.layer.position.x
+
         // add composition
         
         composition = AVMutableComposition()
         // Add two video tracks and two audio tracks.
-        let compositionVideoTrack: AVMutableCompositionTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
+        compositionVideoTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
         
-        let compositionAudioTrack: AVMutableCompositionTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        compositionAudioTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -187,31 +191,28 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
         self.compositionDebugView.setNeedsDisplay()
         
-        timeline.removeAllPositionalSubviews()
-        
-        let numberOfImagesNeeded = timeline.countOfImagesRequired(duration: CMTimeGetSeconds(self.composition!.duration))
-        
-        if kCMTimeZero != composition!.duration && (composition!.tracks(withMediaType: AVMediaTypeVideo).count) > 0 {
-            self.timeline.frame.size.width = CGFloat(numberOfImagesNeeded) * self.timeline.frame.size.height
-            let times = imageTimesForNumberOfImages(numberOfImages: numberOfImagesNeeded)
-        
-            let imageGenerator = AVAssetImageGenerator.init(asset: composition!)
-            
-            // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
-            imageGenerator.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
-                if (image != nil) {
-                    let croppedImage = image!.cropping(to: CGRect(x: (image!.width - image!.height)/2, y: 0, width: image!.height, height: image!.height))
-                    let nextImage = UIImage.init(cgImage: croppedImage!)
-                    DispatchQueue.main.async {
-                        self.timeline.addImageView(nextImage)
-                    }
-                } else {
-                }
-            }
-        }
-        
-        timeline_original_x = self.timeline.layer.position.x
-        
+//        timeline.removeAllPositionalSubviews()
+//
+//        let numberOfImagesNeeded = timeline.countOfImagesRequired(duration: CMTimeGetSeconds(self.composition!.duration))
+//
+//        if kCMTimeZero != composition!.duration && (composition!.tracks(withMediaType: AVMediaTypeVideo).count) > 0 {
+//            self.timeline.frame.size.width = CGFloat(numberOfImagesNeeded) * self.timeline.frame.size.height
+//            let times = imageTimesForNumberOfImages(numberOfImages: numberOfImagesNeeded)
+//
+//            let imageGenerator = AVAssetImageGenerator.init(asset: composition!)
+//
+//            // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
+//            imageGenerator.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
+//                if (image != nil) {
+//                    let croppedImage = image!.cropping(to: CGRect(x: (image!.width - image!.height)/2, y: 0, width: image!.height, height: image!.height))
+//                    let nextImage = UIImage.init(cgImage: croppedImage!)
+//                    DispatchQueue.main.async {
+//                        self.timeline.addImageView(nextImage)
+//                    }
+//                } else {
+//                }
+//            }
+//        }
     }
     
     
@@ -281,30 +282,49 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     // MARK: - IBActions
     
     @IBAction func splitClip(_ sender: Any) {
-        // Trim to half duration
-        let halfDuration = CMTimeGetSeconds(self.composition!.duration)/2.0
-        let trimmedDuration = CMTimeMakeWithSeconds(halfDuration, 1)
-        // Check if a composition already exists, i.e., another tool has been applied
+        var timeRangeInAsset: CMTimeRange? = nil
         
-        // Remove the second half of the existing composition to trim
-        self.composition!.removeTimeRange(CMTimeRangeMake(trimmedDuration, self.composition!.duration))
+        for s in compositionVideoTrack!.segments {
+            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
+            
+            if timeRangeInAsset!.containsTime(player.currentTime()) {
+                try! self.composition!.insertTimeRange(timeRangeInAsset!, of: composition!, at: timeRangeInAsset!.end)
+                
+                try! self.composition!.removeTimeRange(CMTimeRange(start:player.currentTime(), duration:timeRangeInAsset!.duration - CMTime(value: 1, timescale: 600)))
+                
+                break
+            }
+        }
         
         updateMovieTimeline()
-        
-//        // Notify AVSEDocument class to reload the player view with the changes
-//        [[NSNotificationCenter defaultCenter]
-//            postNotificationName:AVSEReloadNotification
-//            object:self];
     }
     @IBAction func copyClip(_ sender: Any) {
-        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, composition!.duration);
-        try! self.composition!.insertTimeRange(timeRangeInAsset, of: composition!, at: self.composition!.duration)
+        var timeRangeInAsset: CMTimeRange? = nil
+        
+        for s in compositionVideoTrack!.segments {
+            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
+            
+            if timeRangeInAsset!.containsTime(player.currentTime()) {
+                try! self.composition!.insertTimeRange(timeRangeInAsset!, of: composition!, at: timeRangeInAsset!.end)
+                
+                break
+            }
+        }
         
         updateMovieTimeline()
     }
     @IBAction func removeClip(_ sender: Any) {
-        let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, composition!.duration);
-        self.composition!.removeTimeRange(CMTimeRangeMake(kCMTimeZero, composition!.duration))
+        var timeRangeInAsset: CMTimeRange? = nil
+
+        for s in compositionVideoTrack!.segments {
+            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
+            
+            if timeRangeInAsset!.containsTime(player.currentTime()) {
+                try! self.composition!.removeTimeRange(timeRangeInAsset!)
+                
+                break
+            }
+        }
         
         updateMovieTimeline()
     }
