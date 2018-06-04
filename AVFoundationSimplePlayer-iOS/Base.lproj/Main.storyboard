@@ -91,6 +91,22 @@
                                 <inset key="imageEdgeInsets" minX="20" minY="20" maxX="20" maxY="20"/>
                                 <state key="normal" image="fullscreen.PNG"/>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="23h-j4-kPd" userLabel="Undo Button">
+                                <rect key="frame" x="9" y="666" width="37" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" image="undo.png"/>
+                                <connections>
+                                    <action selector="undo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lyy-zC-Wvp"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j12-UI-wrM" userLabel="Redo Button">
+                                <rect key="frame" x="52" y="666" width="37" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" image="redo.png"/>
+                                <connections>
+                                    <action selector="redo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ILB-bQ-n9R"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
@@ -99,10 +115,12 @@
                         <outlet property="copyButton" destination="SV9-cG-1eW" id="gTU-ag-yzK"/>
                         <outlet property="playPauseButton" destination="oXx-Rg-8cj" id="cVr-Vl-Xgy"/>
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>
+                        <outlet property="redoButton" destination="j12-UI-wrM" id="vzg-tt-ey7"/>
                         <outlet property="removeButton" destination="vtc-x5-voD" id="WH8-G8-57F"/>
                         <outlet property="splitButton" destination="E8x-Q2-wzR" id="GO1-ry-AZm"/>
                         <outlet property="startTimeLabel" destination="TCk-BI-d4f" id="s5B-ja-H8I"/>
                         <outlet property="timeline" destination="VLA-PF-YHN" id="G7A-3r-Bz4"/>
+                        <outlet property="undoButton" destination="23h-j4-kPd" id="GOG-dM-LXd"/>
                         <outlet property="view" destination="8bC-Xf-vdC" id="lHD-q6-68G"/>
                     </connections>
                 </viewController>
@@ -126,7 +144,9 @@
         <image name="copy.png" width="70" height="140"/>
         <image name="fullscreen.PNG" width="47" height="55"/>
         <image name="playbutton.png" width="49" height="56"/>
+        <image name="redo.png" width="115" height="78"/>
         <image name="remove.png" width="71" height="138"/>
         <image name="split.png" width="71" height="140"/>
+        <image name="undo.png" width="112" height="71"/>
     </resources>
 </document>

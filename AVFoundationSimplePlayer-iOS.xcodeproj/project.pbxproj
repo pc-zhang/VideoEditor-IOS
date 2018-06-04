@@ -27,6 +27,11 @@
 		F078682B20C28BB200861244 /* remove.png in Resources */ = {isa = PBXBuildFile; fileRef = F078682820C28BB200861244 /* remove.png */; };
 		F078682D20C28DE100861244 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = F078682C20C28DE000861244 /* background.png */; };
 		F078682F20C2C02600861244 /* wallstreet.mov in Resources */ = {isa = PBXBuildFile; fileRef = F078682E20C2C02600861244 /* wallstreet.mov */; };
+		F078683320C4E55200861244 /* json.txt in Resources */ = {isa = PBXBuildFile; fileRef = F078683220C4E55200861244 /* json.txt */; };
+		F078683820C5710400861244 /* redo_ban.png in Resources */ = {isa = PBXBuildFile; fileRef = F078683420C5710400861244 /* redo_ban.png */; };
+		F078683920C5710400861244 /* redo.png in Resources */ = {isa = PBXBuildFile; fileRef = F078683520C5710400861244 /* redo.png */; };
+		F078683A20C5710400861244 /* undo_ban.png in Resources */ = {isa = PBXBuildFile; fileRef = F078683620C5710400861244 /* undo_ban.png */; };
+		F078683B20C5710400861244 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = F078683720C5710400861244 /* undo.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +63,11 @@
 		F078682820C28BB200861244 /* remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = remove.png; sourceTree = "<group>"; };
 		F078682C20C28DE000861244 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		F078682E20C2C02600861244 /* wallstreet.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = wallstreet.mov; sourceTree = "<group>"; };
+		F078683220C4E55200861244 /* json.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json.txt; sourceTree = "<group>"; };
+		F078683420C5710400861244 /* redo_ban.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redo_ban.png; sourceTree = "<group>"; };
+		F078683520C5710400861244 /* redo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redo.png; sourceTree = "<group>"; };
+		F078683620C5710400861244 /* undo_ban.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = undo_ban.png; sourceTree = "<group>"; };
+		F078683720C5710400861244 /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = undo.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +128,11 @@
 		F06132BC20BC1D02000039B4 /* VEResource */ = {
 			isa = PBXGroup;
 			children = (
+				F078683420C5710400861244 /* redo_ban.png */,
+				F078683520C5710400861244 /* redo.png */,
+				F078683620C5710400861244 /* undo_ban.png */,
+				F078683720C5710400861244 /* undo.png */,
+				F078683220C4E55200861244 /* json.txt */,
 				F078682C20C28DE000861244 /* background.png */,
 				F078682720C28BB200861244 /* copy.png */,
 				F078682820C28BB200861244 /* remove.png */,
@@ -188,10 +203,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F078683A20C5710400861244 /* undo_ban.png in Resources */,
+				F078683B20C5710400861244 /* undo.png in Resources */,
+				F078683820C5710400861244 /* redo_ban.png in Resources */,
 				D274899C1B1CD4EB0020D82A /* Localizable.strings in Resources */,
 				F078682F20C2C02600861244 /* wallstreet.mov in Resources */,
 				F078682920C28BB200861244 /* split.png in Resources */,
 				F06132E420BC59B4000039B4 /* playbutton.png in Resources */,
+				F078683920C5710400861244 /* redo.png in Resources */,
+				F078683320C4E55200861244 /* json.txt in Resources */,
 				F06132E320BC59B4000039B4 /* pausebutton.png in Resources */,
 				D2385B4B1AF5181400DC8ADE /* Main.storyboard in Resources */,
 				F078682A20C28BB200861244 /* copy.png in Resources */,

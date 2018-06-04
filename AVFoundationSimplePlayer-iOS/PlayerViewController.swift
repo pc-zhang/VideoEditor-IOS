@@ -22,6 +22,19 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     var initialPos: CGFloat = 0
     var compositionVideoTrack: AVMutableCompositionTrack? = nil
     var compositionAudioTrack: AVMutableCompositionTrack? = nil
+    var array: [AVMutableComposition] = []
+    
+    func push() {
+        var newComposition = self.composition!.mutableCopy() as! AVMutableComposition
+//
+//        try! newComposition.insertTimeRange(CMTimeRange(start: kCMTimeZero, duration: self.composition!.duration), of: self.composition!.copy() as! AVAsset, at: kCMTimeZero)
+        
+        array.append(newComposition)
+    }
+    
+    func pop() -> AVMutableComposition? {
+        return array.popLast()
+    }
     
     // Attempt load and test these asset keys before playing.
     static let assetKeysRequiredToPlay = [
@@ -89,12 +102,8 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     
     // MARK: - IBOutlets
     
-//    @IBOutlet weak var timeSlider: UISlider!
     @IBOutlet weak var startTimeLabel: UILabel!
-//    @IBOutlet weak var durationLabel: UILabel!
-//    @IBOutlet weak var rewindButton: UIButton!
     @IBOutlet weak var playPauseButton: UIButton!
-//    @IBOutlet weak var fastForwardButton: UIButton!
     @IBOutlet weak var playerView: PlayerView!
     @IBOutlet weak var timeline: TimelineView!
     @IBOutlet weak var compositionDebugView: APLCompositionDebugView!
@@ -102,6 +111,8 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     @IBOutlet weak var splitButton: UIButton!
     @IBOutlet weak var copyButton: UIButton!
     @IBOutlet weak var removeButton: UIButton!
+    @IBOutlet weak var undoButton: UIButton!
+    @IBOutlet weak var redoButton: UIButton!
     
     // MARK: - View Controller
     
@@ -281,7 +292,17 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     
     // MARK: - IBActions
     
+    @IBAction func undo(_ sender: Any) {
+        self.composition = pop()
+        
+        updateMovieTimeline()
+    }
+    
+    @IBAction func redo(_ sender: Any) {
+    }
+    
     @IBAction func splitClip(_ sender: Any) {
+        push()
         var timeRangeInAsset: CMTimeRange? = nil
         
         for s in compositionVideoTrack!.segments {
@@ -297,8 +318,15 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         }
         
         updateMovieTimeline()
+        
+//        let filePath  = Bundle.main.path(forResource: "json", ofType:"txt")
+//        let nsMutData = NSData(contentsOfFile:filePath!)
+//        var sJson: Any
+//        try! sJson = JSONSerialization.jsonObject(with: nsMutData! as Data, options: .mutableContainers)
     }
     @IBAction func copyClip(_ sender: Any) {
+        push()
+        
         var timeRangeInAsset: CMTimeRange? = nil
         
         for s in compositionVideoTrack!.segments {
@@ -314,6 +342,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         updateMovieTimeline()
     }
     @IBAction func removeClip(_ sender: Any) {
+        push()
         var timeRangeInAsset: CMTimeRange? = nil
 
         for s in compositionVideoTrack!.segments {
@@ -485,6 +514,16 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
             let buttonImage = UIImage(named: buttonImageName)
             
             playPauseButton.setImage(buttonImage, for: UIControlState())
+        }
+        else if keyPath == #keyPath(PlayerViewController.array) {
+            
+            let count = (change?[NSKeyValueChangeKey.newKey] as! NSArray).count
+            
+            let buttonImageName = count == 0 ? "undo_ban" : "undo"
+            
+            let buttonImage = UIImage(named: buttonImageName)
+            
+            undoButton.setImage(buttonImage, for: UIControlState())
         }
         else if keyPath == #keyPath(PlayerViewController.player.currentItem.status) {
             // Display an error if status becomes `.Failed`.
