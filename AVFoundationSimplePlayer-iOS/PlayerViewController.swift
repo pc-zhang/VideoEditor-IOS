@@ -20,20 +20,18 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     // MARK: Properties
     var seekTimer: Timer? = nil
     var initialPos: CGFloat = 0
-    var compositionVideoTrack: AVMutableCompositionTrack? = nil
-    var compositionAudioTrack: AVMutableCompositionTrack? = nil
-    var array: [AVMutableComposition] = []
+    var stack: [AVMutableComposition] = []
+    var undoPos: Int = -1
     
     func push() {
         var newComposition = self.composition!.mutableCopy() as! AVMutableComposition
-//
-//        try! newComposition.insertTimeRange(CMTimeRange(start: kCMTimeZero, duration: self.composition!.duration), of: self.composition!.copy() as! AVAsset, at: kCMTimeZero)
         
-        array.append(newComposition)
-    }
-    
-    func pop() -> AVMutableComposition? {
-        return array.popLast()
+        while undoPos < stack.count - 1 {
+            stack.removeLast()
+        }
+        
+        stack.append(newComposition)
+        undoPos = stack.count - 1
     }
     
     // Attempt load and test these asset keys before playing.
@@ -150,9 +148,11 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         
         composition = AVMutableComposition()
         // Add two video tracks and two audio tracks.
-        compositionVideoTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
+        let compositionVideoTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
         
-        compositionAudioTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        let compositionAudioTrack = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        
+        push()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -275,9 +275,10 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
                  We can play this asset. Create a new `AVPlayerItem` and make
                  it our player's current item.
                  */
-                let timeRangeInAsset = CMTimeRangeMake(kCMTimeZero, newAsset.duration);
                 
-                try! self.composition!.insertTimeRange(timeRangeInAsset, of: newAsset, at: kCMTimeZero)
+                try! self.composition!.insertTimeRange(CMTimeRangeMake(kCMTimeZero, newAsset.duration), of: newAsset, at: kCMTimeZero)
+                
+                self.push()
                 
                 self.playerItem = AVPlayerItem(asset: self.composition!)
                 self.playerItem!.videoComposition = self.videoComposition
@@ -293,17 +294,31 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     // MARK: - IBActions
     
     @IBAction func undo(_ sender: Any) {
-        self.composition = pop()
+        if undoPos <= 0 {
+            return
+        }
+        
+        undoPos -= 1
+        self.composition = stack[undoPos]
         
         updateMovieTimeline()
     }
     
     @IBAction func redo(_ sender: Any) {
+        if undoPos == stack.count - 1 {
+            return
+        }
+        
+        undoPos += 1
+        self.composition = stack[undoPos]
+        
+        updateMovieTimeline()
     }
     
     @IBAction func splitClip(_ sender: Any) {
-        push()
         var timeRangeInAsset: CMTimeRange? = nil
+        
+        let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
             timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
@@ -318,16 +333,17 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         }
         
         updateMovieTimeline()
-        
+        push()
+
 //        let filePath  = Bundle.main.path(forResource: "json", ofType:"txt")
 //        let nsMutData = NSData(contentsOfFile:filePath!)
 //        var sJson: Any
 //        try! sJson = JSONSerialization.jsonObject(with: nsMutData! as Data, options: .mutableContainers)
     }
     @IBAction func copyClip(_ sender: Any) {
-        push()
-        
         var timeRangeInAsset: CMTimeRange? = nil
+        
+        let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
             timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
@@ -340,11 +356,14 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         }
         
         updateMovieTimeline()
+        push()
+
     }
     @IBAction func removeClip(_ sender: Any) {
-        push()
         var timeRangeInAsset: CMTimeRange? = nil
 
+        let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
+        
         for s in compositionVideoTrack!.segments {
             timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
             
@@ -356,6 +375,8 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         }
         
         updateMovieTimeline()
+        push()
+
     }
     
     @IBAction func playPauseButtonWasPressed(_ sender: UIButton) {
@@ -515,15 +536,21 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
             
             playPauseButton.setImage(buttonImage, for: UIControlState())
         }
-        else if keyPath == #keyPath(PlayerViewController.array) {
+        else if keyPath == #keyPath(PlayerViewController.stack) {
             
             let count = (change?[NSKeyValueChangeKey.newKey] as! NSArray).count
             
-            let buttonImageName = count == 0 ? "undo_ban" : "undo"
+            let undoButtonImageName = undoPos < 0 ? "undo_ban" : "undo"
             
-            let buttonImage = UIImage(named: buttonImageName)
+            let undoButtonImage = UIImage(named: undoButtonImageName)
             
-            undoButton.setImage(buttonImage, for: UIControlState())
+            undoButton.setImage(undoButtonImage, for: UIControlState())
+            
+            let redoButtonImageName = undoPos == stack.count - 1 ? "redo_ban" : "redo"
+            
+            let redoButtonImage = UIImage(named: redoButtonImageName)
+            
+            undoButton.setImage(redoButtonImage, for: UIControlState())
         }
         else if keyPath == #keyPath(PlayerViewController.player.currentItem.status) {
             // Display an error if status becomes `.Failed`.
