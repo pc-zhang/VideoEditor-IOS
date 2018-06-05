@@ -21,7 +21,21 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     var seekTimer: Timer? = nil
     var initialPos: CGFloat = 0
     var stack: [AVMutableComposition] = []
-    var undoPos: Int = -1
+    var undoPos: Int = -1 {
+        didSet {
+            let undoButtonImageName = undoPos <= 0 ? "undo_ban" : "undo"
+            
+            let undoButtonImage = UIImage(named: undoButtonImageName)
+            
+            undoButton.setImage(undoButtonImage, for: UIControlState())
+            
+            let redoButtonImageName = undoPos == stack.count - 1 ? "redo_ban" : "redo"
+            
+            let redoButtonImage = UIImage(named: redoButtonImageName)
+            
+            redoButton.setImage(redoButtonImage, for: UIControlState())
+        }
+    }
     
     func push() {
         var newComposition = self.composition!.mutableCopy() as! AVMutableComposition
@@ -535,22 +549,6 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
             let buttonImage = UIImage(named: buttonImageName)
             
             playPauseButton.setImage(buttonImage, for: UIControlState())
-        }
-        else if keyPath == #keyPath(PlayerViewController.stack) {
-            
-            let count = (change?[NSKeyValueChangeKey.newKey] as! NSArray).count
-            
-            let undoButtonImageName = undoPos < 0 ? "undo_ban" : "undo"
-            
-            let undoButtonImage = UIImage(named: undoButtonImageName)
-            
-            undoButton.setImage(undoButtonImage, for: UIControlState())
-            
-            let redoButtonImageName = undoPos == stack.count - 1 ? "redo_ban" : "redo"
-            
-            let redoButtonImage = UIImage(named: redoButtonImageName)
-            
-            undoButton.setImage(redoButtonImage, for: UIControlState())
         }
         else if keyPath == #keyPath(PlayerViewController.player.currentItem.status) {
             // Display an error if status becomes `.Failed`.
