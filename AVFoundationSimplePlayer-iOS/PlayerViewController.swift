@@ -299,7 +299,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         }
         
         undoPos -= 1
-        self.composition = stack[undoPos]
+        self.composition = stack[undoPos].mutableCopy() as! AVMutableComposition
         
         updateMovieTimeline()
     }
@@ -310,7 +310,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         }
         
         undoPos += 1
-        self.composition = stack[undoPos]
+        self.composition = stack[undoPos].mutableCopy() as! AVMutableComposition
         
         updateMovieTimeline()
     }
