@@ -21,6 +21,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     var seekTimer: Timer? = nil
     var initialPos: CGFloat = 0
     var stack: [AVMutableComposition] = []
+    var imageGenerator: AVAssetImageGenerator? = nil
     var undoPos: Int = -1 {
         didSet {
             let undoButtonImageName = undoPos <= 0 ? "undo_ban" : "undo"
@@ -57,13 +58,14 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     let player = AVPlayer()
     
     var timeline_original_x : CGFloat = 0.0
+    var timeline_original_width : CGFloat = 0.0
     
     var currentTime: Double {
         get {
             return CMTimeGetSeconds(player.currentTime())
         }
         set {
-            let newTime = CMTimeMakeWithSeconds(newValue, 1)
+            let newTime = CMTimeMakeWithSeconds(newValue, 60)
             player.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
         }
     }
@@ -156,7 +158,9 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
             self.startTimeLabel.text = self.createTimeString(time: timeElapsed)
         }
         
+        setAnchorPoint(anchorPoint: CGPoint(x: 0, y: 0), forView: timeline)
         timeline_original_x = self.timeline.layer.position.x
+        timeline_original_width = self.timeline.bounds.width
 
         // add composition
         
@@ -212,32 +216,38 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     }
     
     func updateMovieTimeline() {
+        self.playerItem = AVPlayerItem(asset: self.composition!)
+        self.playerItem!.videoComposition = self.videoComposition
+        self.playerItem!.audioMix = self.audioMix
+        self.player.replaceCurrentItem(with: self.playerItem)
+        
         self.compositionDebugView.player = self.player
         self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
         self.compositionDebugView.setNeedsDisplay()
         
-//        timeline.removeAllPositionalSubviews()
-//
-//        let numberOfImagesNeeded = timeline.countOfImagesRequired(duration: CMTimeGetSeconds(self.composition!.duration))
-//
-//        if kCMTimeZero != composition!.duration && (composition!.tracks(withMediaType: AVMediaTypeVideo).count) > 0 {
-//            self.timeline.frame.size.width = CGFloat(numberOfImagesNeeded) * self.timeline.frame.size.height
-//            let times = imageTimesForNumberOfImages(numberOfImages: numberOfImagesNeeded)
-//
-//            let imageGenerator = AVAssetImageGenerator.init(asset: composition!)
-//
-//            // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
-//            imageGenerator.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
-//                if (image != nil) {
-//                    let croppedImage = image!.cropping(to: CGRect(x: (image!.width - image!.height)/2, y: 0, width: image!.height, height: image!.height))
-//                    let nextImage = UIImage.init(cgImage: croppedImage!)
-//                    DispatchQueue.main.async {
-//                        self.timeline.addImageView(nextImage)
-//                    }
-//                } else {
-//                }
-//            }
-//        }
+        if kCMTimeZero != composition!.duration {
+            self.timeline.bounds.size.width = CGFloat(CMTimeGetSeconds(composition!.duration)) / 15 * timeline_original_width
+            let numberOfImagesNeeded = UInt(self.timeline.bounds.width / self.timeline.bounds.height)
+            let times = imageTimesForNumberOfImages(numberOfImages: numberOfImagesNeeded)
+
+            imageGenerator?.cancelAllCGImageGeneration()
+            timeline.removeAllPositionalSubviews()
+
+            imageGenerator = AVAssetImageGenerator.init(asset: composition!)
+            imageGenerator?.maximumSize = CGSize(width: self.timeline.bounds.height * 2, height: self.timeline.bounds.height * 2)
+
+            // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
+            imageGenerator?.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
+                if (image != nil) {
+                    let croppedImage = image!.cropping(to: CGRect(x: (image!.width - image!.height)/2, y: 0, width: image!.height, height: image!.height))
+                    let nextImage = UIImage.init(cgImage: croppedImage!)
+                    DispatchQueue.main.async {
+                        self.timeline.addImageView(nextImage)
+                    }
+                } else {
+                }
+            }
+        }
     }
     
     
@@ -293,11 +303,6 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
                 try! self.composition!.insertTimeRange(CMTimeRangeMake(kCMTimeZero, newAsset.duration), of: newAsset, at: kCMTimeZero)
                 
                 self.push()
-                
-                self.playerItem = AVPlayerItem(asset: self.composition!)
-                self.playerItem!.videoComposition = self.videoComposition
-                self.playerItem!.audioMix = self.audioMix
-                self.player.replaceCurrentItem(with: self.playerItem)
                 
                 // update timeline
                 self.updateMovieTimeline()
@@ -448,6 +453,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         // the superview's coordinate space.
         let translation = gestureRecognizer.translation(in: piece.superview)
         if gestureRecognizer.state == .began {
+            self.player.pause()
             self.timeline.layer.removeAllAnimations()
             // Save the view's original position.
             
@@ -602,6 +608,50 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     }
     
     // MARK: Convenience
+    
+    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+        let size = image.size
+        
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        // Figure out what our orientation is, and use that to form the rectangle
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
+        }
+        
+        // This is the rect that we've calculated out and this is what is actually used below
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+        
+        // Actually do the resizing to the rect using the ImageContext stuff
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage!
+    }
+    
+    func setAnchorPoint(anchorPoint: CGPoint, forView view: UIView) {
+        var newPoint = CGPoint(x: view.bounds.width * anchorPoint.x, y: view.bounds.height * anchorPoint.y)
+        var oldPoint = CGPoint(x: view.bounds.width * view.layer.anchorPoint.x, y: view.bounds.height * view.layer.anchorPoint.y)
+        
+        newPoint = newPoint.applying(view.transform)
+        oldPoint = oldPoint.applying(view.transform)
+        
+        var position = view.layer.position
+        position.x -= oldPoint.x
+        position.x += newPoint.x
+        
+        position.y -= oldPoint.y
+        position.y += newPoint.y
+        
+        view.layer.position = position
+        view.layer.anchorPoint = anchorPoint
+    }
     
     func createTimeString(time: Float) -> String {
         let components = NSDateComponents()

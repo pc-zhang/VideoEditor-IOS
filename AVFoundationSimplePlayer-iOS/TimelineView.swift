@@ -24,15 +24,11 @@ class TimelineView : UIView {
         self.imagesAdded = 0
     }
     
-    func countOfImagesRequired(duration: Double) -> UInt {
-        return UInt(floor(duration / 15 * Double(self.frame.size.width) / Double(self.frame.size.height)))
-    }
-    
     func addImageView(_ image: UIImage!) {
-        let nextX = CGFloat(self.imagesAdded) * self.frame.size.height
-        let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: self.frame.size.height, height: self.frame.size.height))
+        let nextX = CGFloat(self.imagesAdded) * self.bounds.height
+        let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: self.bounds.height, height: self.bounds.height))
         
-        nextView.image = image;
+        nextView.image = image
         self.addSubview(nextView)
         self.setNeedsDisplay(self.frame)
         
