@@ -14,9 +14,9 @@ import UIKit
  KVO context used to differentiate KVO callbacks for this class versus other
  classes in its class hierarchy.
  */
-private var playerViewControllerKVOContext = 0
+private var MainViewControllerKVOContext = 0
 
-class PlayerViewController: UIViewController, CAAnimationDelegate {
+class MainViewController: UIViewController, CAAnimationDelegate {
     // MARK: Properties
     var seekTimer: Timer? = nil
     var initialPos: CGFloat = 0
@@ -140,13 +140,13 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
          and not those destined for a subclass that also happens to be observing
          these properties.
          */
-        addObserver(self, forKeyPath: #keyPath(PlayerViewController.player.currentItem.duration), options: [.new, .initial], context: &playerViewControllerKVOContext)
-        addObserver(self, forKeyPath: #keyPath(PlayerViewController.player.rate), options: [.new, .initial], context: &playerViewControllerKVOContext)
-        addObserver(self, forKeyPath: #keyPath(PlayerViewController.player.currentItem.status), options: [.new, .initial], context: &playerViewControllerKVOContext)
+        addObserver(self, forKeyPath: #keyPath(MainViewController.player.currentItem.duration), options: [.new, .initial], context: &MainViewControllerKVOContext)
+        addObserver(self, forKeyPath: #keyPath(MainViewController.player.rate), options: [.new, .initial], context: &MainViewControllerKVOContext)
+        addObserver(self, forKeyPath: #keyPath(MainViewController.player.currentItem.status), options: [.new, .initial], context: &MainViewControllerKVOContext)
         
         playerView.playerLayer.player = player
         
-        let movieURL = Bundle.main.url(forResource: "strategy", withExtension: "mp4")!
+        let movieURL = Bundle.main.url(forResource: "wallstreet", withExtension: "mov")!
         let asset = AVURLAsset(url: movieURL, options: nil)
         asynchronouslyLoadURLAsset(asset)
         
@@ -183,9 +183,9 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         
         player.pause()
         
-        removeObserver(self, forKeyPath: #keyPath(PlayerViewController.player.currentItem.duration), context: &playerViewControllerKVOContext)
-        removeObserver(self, forKeyPath: #keyPath(PlayerViewController.player.rate), context: &playerViewControllerKVOContext)
-        removeObserver(self, forKeyPath: #keyPath(PlayerViewController.player.currentItem.status), context: &playerViewControllerKVOContext)
+        removeObserver(self, forKeyPath: #keyPath(MainViewController.player.currentItem.duration), context: &MainViewControllerKVOContext)
+        removeObserver(self, forKeyPath: #keyPath(MainViewController.player.rate), context: &MainViewControllerKVOContext)
+        removeObserver(self, forKeyPath: #keyPath(MainViewController.player.currentItem.status), context: &MainViewControllerKVOContext)
     }
     
     
@@ -262,7 +262,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
          main UI thread) whilst I/O happens to populate the properties. It's
          prudent to defer our work until the properties we need have been loaded.
          */
-        newAsset.loadValuesAsynchronously(forKeys: PlayerViewController.assetKeysRequiredToPlay) {
+        newAsset.loadValuesAsynchronously(forKeys: MainViewController.assetKeysRequiredToPlay) {
             /*
              The asset invokes its completion handler on an arbitrary queue.
              To avoid multiple threads using our internal state at the same time
@@ -275,7 +275,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
                  Test whether the values of each of the keys we need have been
                  successfully loaded.
                  */
-                for key in PlayerViewController.assetKeysRequiredToPlay {
+                for key in MainViewController.assetKeysRequiredToPlay {
                     var error: NSError?
                     
                     if newAsset.statusOfValue(forKey: key, error: &error) == .failed {
@@ -506,12 +506,12 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     // Update our UI when player or `player.currentItem` changes.
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         // Make sure the this KVO callback was intended for this view controller.
-        guard context == &playerViewControllerKVOContext else {
+        guard context == &MainViewControllerKVOContext else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             return
         }
         
-        if keyPath == #keyPath(PlayerViewController.player.currentItem.duration) {
+        if keyPath == #keyPath(MainViewController.player.currentItem.duration) {
             // Update timeSlider and enable/disable controls when duration > 0.0
             
             /*
@@ -548,7 +548,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
 //            durationLabel.isEnabled = hasValidDuration
 //            durationLabel.text = createTimeString(time: Float(newDurationSeconds))
         }
-        else if keyPath == #keyPath(PlayerViewController.player.rate) {
+        else if keyPath == #keyPath(MainViewController.player.rate) {
             // Update `playPauseButton` image.
             
             let newRate = (change?[NSKeyValueChangeKey.newKey] as! NSNumber).doubleValue
@@ -559,7 +559,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
             
             playPauseButton.setImage(buttonImage, for: UIControlState())
         }
-        else if keyPath == #keyPath(PlayerViewController.player.currentItem.status) {
+        else if keyPath == #keyPath(MainViewController.player.currentItem.status) {
             // Display an error if status becomes `.Failed`.
             
             /*
@@ -584,8 +584,8 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     // Trigger KVO for anyone observing our properties affected by player and player.currentItem
     override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
         let affectedKeyPathsMappingByKey: [String: Set<String>] = [
-            "duration":     [#keyPath(PlayerViewController.player.currentItem.duration)],
-            "rate":         [#keyPath(PlayerViewController.player.rate)]
+            "duration":     [#keyPath(MainViewController.player.currentItem.duration)],
+            "rate":         [#keyPath(MainViewController.player.rate)]
         ]
         
         return affectedKeyPathsMappingByKey[key] ?? super.keyPathsForValuesAffectingValue(forKey: key)
