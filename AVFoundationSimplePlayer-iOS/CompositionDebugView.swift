@@ -141,59 +141,53 @@ class CompositionDebugView : UIView {
         }
         
         
-//        if (_composition) {
-//            self.layer.sublayers = nil;
-//            CGRect visibleRect = self.layer.bounds;
-//            CGRect currentTimeRect = visibleRect;
-//
-//            // The red band of the timeMaker will be 8 pixels wide
-//            currentTimeRect.origin.x = 0;
-//            currentTimeRect.size.width = 8;
-//
-//            CAShapeLayer *timeMarkerRedBandLayer = [CAShapeLayer layer];
-//            timeMarkerRedBandLayer.frame = currentTimeRect;
-//            timeMarkerRedBandLayer.position = CGPointMake(rowRect.origin.x, self.bounds.size.height / 2);
-//            CGPathRef linePath = CGPathCreateWithRect(currentTimeRect, NULL);
-//            timeMarkerRedBandLayer.fillColor = [[UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:0.5] CGColor];
-//            timeMarkerRedBandLayer.path = linePath;
-//
-//            CGPathRelease(linePath);
-//
-//            currentTimeRect.origin.x = 0;
-//            currentTimeRect.size.width = 1;
-//
-//            // Position the white line layer of the timeMarker at the center of the red band layer
-//            CAShapeLayer *timeMarkerWhiteLineLayer = [CAShapeLayer layer];
-//            timeMarkerWhiteLineLayer.frame = currentTimeRect;
-//            timeMarkerWhiteLineLayer.position = CGPointMake(4, self.bounds.size.height / 2);
-//            CGPathRef whiteLinePath = CGPathCreateWithRect(currentTimeRect, NULL);
-//            timeMarkerWhiteLineLayer.fillColor = [[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0] CGColor];
-//            timeMarkerWhiteLineLayer.path = whiteLinePath;
-//
-//            CGPathRelease(whiteLinePath);
-//
-//            // Add the white line layer to red band layer, by doing so we can only animate the red band layer which in turn animates its sublayers
-//            [timeMarkerRedBandLayer addSublayer:timeMarkerWhiteLineLayer];
-//
-//            // This scrubbing animation controls the x position of the timeMarker
-//            // On the left side it is bound to where the first segment rectangle of the composition starts
-//            // On the right side it is bound to where the last segment rectangle of the composition ends
-//            // Playback at rate 1.0 would take the timeMarker "duration" time to reach from one end to the other, that is marked as the duration of the animation
-//            CABasicAnimation *scrubbingAnimation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-//            scrubbingAnimation.fromValue = [NSNumber numberWithFloat:[self horizontalPositionForTime:kCMTimeZero]];
-//            scrubbingAnimation.toValue = [NSNumber numberWithFloat:[self horizontalPositionForTime:_composition.duration]];
-//            scrubbingAnimation.removedOnCompletion = NO;
-//            scrubbingAnimation.beginTime = AVCoreAnimationBeginTimeAtZero;
-//            scrubbingAnimation.duration = CMTimeGetSeconds(_composition.duration);
-//            scrubbingAnimation.fillMode = kCAFillModeBoth;
-//            [timeMarkerRedBandLayer addAnimation:scrubbingAnimation forKey:nil];
-//
-//            // We add the red band layer along with the scrubbing animation to a AVSynchronizedLayer to have precise timing information
-//            AVSynchronizedLayer *syncLayer = [AVSynchronizedLayer synchronizedLayerWithPlayerItem:self.player.currentItem];
-//            [syncLayer addSublayer:timeMarkerRedBandLayer];
-//
-//            [self.layer addSublayer:syncLayer];
-//        }
+        if (composition != nil) {
+            self.layer.sublayers = nil
+            var currentTimeRect = self.layer.bounds
+
+            // The red band of the timeMaker will be 8 pixels wide
+            currentTimeRect.origin.x = 0
+            currentTimeRect.size.width = 8
+
+            var timeMarkerRedBandLayer = CAShapeLayer()
+            timeMarkerRedBandLayer.frame = currentTimeRect
+            timeMarkerRedBandLayer.position = CGPoint(x:rowRect.origin.x, y:self.bounds.size.height / 2)
+            let linePath = CGPath(rect: currentTimeRect, transform: nil)
+            timeMarkerRedBandLayer.fillColor = #colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.5)
+            timeMarkerRedBandLayer.path = linePath
+
+            currentTimeRect.origin.x = 0
+            currentTimeRect.size.width = 1
+
+            // Position the white line layer of the timeMarker at the center of the red band layer
+            var timeMarkerWhiteLineLayer = CAShapeLayer()
+            timeMarkerWhiteLineLayer.frame = currentTimeRect
+            timeMarkerWhiteLineLayer.position = CGPoint(x:4, y:self.bounds.size.height / 2)
+            let whiteLinePath = CGPath(rect: currentTimeRect, transform: nil)
+            timeMarkerWhiteLineLayer.fillColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+            timeMarkerWhiteLineLayer.path = whiteLinePath
+
+            // Add the white line layer to red band layer, by doing so we can only animate the red band layer which in turn animates its sublayers
+            timeMarkerRedBandLayer.addSublayer(timeMarkerWhiteLineLayer)
+
+            // This scrubbing animation controls the x position of the timeMarker
+            // On the left side it is bound to where the first segment rectangle of the composition starts
+            // On the right side it is bound to where the last segment rectangle of the composition ends
+            // Playback at rate 1.0 would take the timeMarker "duration" time to reach from one end to the other, that is marked as the duration of the animation
+            let scrubbingAnimation = CABasicAnimation(keyPath: "position.x")
+            scrubbingAnimation.fromValue = horizontalPositionForTime(time: kCMTimeZero)
+            scrubbingAnimation.toValue = horizontalPositionForTime(time: (composition?.duration)!)
+            scrubbingAnimation.isRemovedOnCompletion = false
+            scrubbingAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+            scrubbingAnimation.duration = CMTimeGetSeconds((composition?.duration)!)
+            scrubbingAnimation.fillMode = kCAFillModeBoth
+            timeMarkerRedBandLayer.add(scrubbingAnimation, forKey: nil)
+
+            // We add the red band layer along with the scrubbing animation to a AVSynchronizedLayer to have precise timing information
+            let syncLayer = AVSynchronizedLayer(playerItem: self.player.currentItem!)
+            syncLayer.addSublayer(timeMarkerRedBandLayer)
+            self.layer.addSublayer(syncLayer)
+        }
     }
     
     
