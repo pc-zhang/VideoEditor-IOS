@@ -47,11 +47,6 @@
                                     <outletCollection property="gestureRecognizers" destination="eOt-vD-jk5" appends="YES" id="8K0-nJ-1KP"/>
                                 </connections>
                             </view>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3YQ-cI-V47" userLabel="Composition Debug View" customClass="CompositionDebugView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
-                                <rect key="frame" x="16" y="34" width="343" height="125"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vtc-x5-voD" userLabel="Remove Button">
                                 <rect key="frame" x="329" y="715" width="24" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -111,7 +106,6 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <connections>
-                        <outlet property="compositionDebugView" destination="3YQ-cI-V47" id="Ise-KJ-Ch0"/>
                         <outlet property="copyButton" destination="SV9-cG-1eW" id="gTU-ag-yzK"/>
                         <outlet property="playPauseButton" destination="oXx-Rg-8cj" id="cVr-Vl-Xgy"/>
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>

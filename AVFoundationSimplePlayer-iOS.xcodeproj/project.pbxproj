@@ -17,7 +17,6 @@
 		F06132E020BC4DEE000039B4 /* fullscreen.PNG in Resources */ = {isa = PBXBuildFile; fileRef = F06132DF20BC4DEE000039B4 /* fullscreen.PNG */; };
 		F06132E320BC59B4000039B4 /* pausebutton.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E120BC59B3000039B4 /* pausebutton.png */; };
 		F06132E420BC59B4000039B4 /* playbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E220BC59B4000039B4 /* playbutton.png */; };
-		F06E72CC20D8DBE000A0D94F /* CompositionDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F06E72CB20D8DBDF00A0D94F /* CompositionDebugView.swift */; };
 		F078682920C28BB200861244 /* split.png in Resources */ = {isa = PBXBuildFile; fileRef = F078682620C28BB100861244 /* split.png */; };
 		F078682A20C28BB200861244 /* copy.png in Resources */ = {isa = PBXBuildFile; fileRef = F078682720C28BB200861244 /* copy.png */; };
 		F078682B20C28BB200861244 /* remove.png in Resources */ = {isa = PBXBuildFile; fileRef = F078682820C28BB200861244 /* remove.png */; };
@@ -42,7 +41,6 @@
 		F06132DF20BC4DEE000039B4 /* fullscreen.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullscreen.PNG; sourceTree = "<group>"; };
 		F06132E120BC59B3000039B4 /* pausebutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pausebutton.png; sourceTree = "<group>"; };
 		F06132E220BC59B4000039B4 /* playbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playbutton.png; sourceTree = "<group>"; };
-		F06E72CB20D8DBDF00A0D94F /* CompositionDebugView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompositionDebugView.swift; sourceTree = "<group>"; };
 		F078682620C28BB100861244 /* split.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = split.png; sourceTree = "<group>"; };
 		F078682720C28BB200861244 /* copy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = copy.png; sourceTree = "<group>"; };
 		F078682820C28BB200861244 /* remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = remove.png; sourceTree = "<group>"; };
@@ -88,7 +86,6 @@
 				F06132BC20BC1D02000039B4 /* VEResource */,
 				D20EB3C11AF94FDE0059CD72 /* MainViewController.swift */,
 				D27489961B1CD4E00020D82A /* PlayerView.swift */,
-				F06E72CB20D8DBDF00A0D94F /* CompositionDebugView.swift */,
 				F02B66D820C1020700E879FE /* TimelineView.swift */,
 				D2385B491AF5181400DC8ADE /* Main.storyboard */,
 				D2385B511AF5181400DC8ADE /* Info.plist */,
@@ -214,7 +211,6 @@
 				F02B66D920C1020700E879FE /* TimelineView.swift in Sources */,
 				D2385B461AF5181400DC8ADE /* AppDelegate.swift in Sources */,
 				D20EB3C21AF94FDE0059CD72 /* MainViewController.swift in Sources */,
-				F06E72CC20D8DBE000A0D94F /* CompositionDebugView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

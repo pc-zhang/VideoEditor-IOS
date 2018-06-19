@@ -120,7 +120,6 @@ class MainViewController: UIViewController, CAAnimationDelegate {
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var playerView: PlayerView!
     @IBOutlet weak var timeline: TimelineView!
-    @IBOutlet weak var compositionDebugView: CompositionDebugView!
     
     @IBOutlet weak var splitButton: UIButton!
     @IBOutlet weak var copyButton: UIButton!
@@ -221,12 +220,11 @@ class MainViewController: UIViewController, CAAnimationDelegate {
         self.playerItem!.audioMix = self.audioMix
         self.player.replaceCurrentItem(with: self.playerItem)
         
-        self.compositionDebugView.player = self.player
-        self.compositionDebugView.composition = self.composition
-        self.compositionDebugView.videoComposition = nil
-        self.compositionDebugView.audioMix = nil
-        
-        self.compositionDebugView.setNeedsDisplay()
+//        self.compositionDebugView.player = self.player
+//        self.compositionDebugView.composition = self.composition
+//        self.compositionDebugView.videoComposition = nil
+//        self.compositionDebugView.audioMix = nil
+//        self.compositionDebugView.setNeedsDisplay()
         
         if kCMTimeZero != composition!.duration {
             self.timeline.bounds.size.width = CGFloat(CMTimeGetSeconds(composition!.duration)) / 15 * timeline_original_width
