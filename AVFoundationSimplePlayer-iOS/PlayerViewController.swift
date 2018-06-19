@@ -120,7 +120,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var playerView: PlayerView!
     @IBOutlet weak var timeline: TimelineView!
-    @IBOutlet weak var compositionDebugView: APLCompositionDebugView!
+    @IBOutlet weak var compositionDebugView: CompositionDebugView!
     
     @IBOutlet weak var splitButton: UIButton!
     @IBOutlet weak var copyButton: UIButton!
@@ -146,7 +146,7 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         
         playerView.playerLayer.player = player
         
-        let movieURL = Bundle.main.url(forResource: "wallstreet", withExtension: "mov")!
+        let movieURL = Bundle.main.url(forResource: "strategy", withExtension: "mp4")!
         let asset = AVURLAsset(url: movieURL, options: nil)
         asynchronouslyLoadURLAsset(asset)
         
@@ -222,7 +222,10 @@ class PlayerViewController: UIViewController, CAAnimationDelegate {
         self.player.replaceCurrentItem(with: self.playerItem)
         
         self.compositionDebugView.player = self.player
-        self.compositionDebugView.synchronize(to: self.composition, videoComposition: nil, audioMix: nil)
+        self.compositionDebugView.composition = self.composition
+        self.compositionDebugView.videoComposition = nil
+        self.compositionDebugView.audioMix = nil
+        
         self.compositionDebugView.setNeedsDisplay()
         
         if kCMTimeZero != composition!.duration {
