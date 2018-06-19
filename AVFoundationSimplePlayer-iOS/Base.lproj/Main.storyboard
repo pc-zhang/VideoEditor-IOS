@@ -37,16 +37,6 @@
                                 <color key="textColor" red="0.70588235294117652" green="0.70196078431372544" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-PF-YHN" customClass="TimelineView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
-                                <rect key="frame" x="185" y="535" width="190" height="61"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <gestureRecognizers/>
-                                <connections>
-                                    <outletCollection property="gestureRecognizers" destination="5qt-4k-GCQ" appends="YES" id="lpe-0c-WY4"/>
-                                    <outletCollection property="gestureRecognizers" destination="eOt-vD-jk5" appends="YES" id="8K0-nJ-1KP"/>
-                                </connections>
-                            </view>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vtc-x5-voD" userLabel="Remove Button">
                                 <rect key="frame" x="329" y="715" width="24" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -102,6 +92,19 @@
                                     <action selector="redo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ILB-bQ-n9R"/>
                                 </connections>
                             </button>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" directionalLockEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.050000000000000003" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TzF-TE-dY9">
+                                <rect key="frame" x="0.0" y="466" width="375" height="225"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-PF-YHN" customClass="TimelineView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="65" width="375" height="68"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <gestureRecognizers/>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
@@ -111,24 +114,15 @@
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>
                         <outlet property="redoButton" destination="j12-UI-wrM" id="vzg-tt-ey7"/>
                         <outlet property="removeButton" destination="vtc-x5-voD" id="WH8-G8-57F"/>
+                        <outlet property="scrollview" destination="TzF-TE-dY9" id="Pnm-0z-r5J"/>
                         <outlet property="splitButton" destination="E8x-Q2-wzR" id="GO1-ry-AZm"/>
                         <outlet property="startTimeLabel" destination="TCk-BI-d4f" id="s5B-ja-H8I"/>
-                        <outlet property="timeline" destination="VLA-PF-YHN" id="G7A-3r-Bz4"/>
+                        <outlet property="timelineView" destination="VLA-PF-YHN" id="G7A-3r-Bz4"/>
                         <outlet property="undoButton" destination="23h-j4-kPd" id="GOG-dM-LXd"/>
                         <outlet property="view" destination="8bC-Xf-vdC" id="lHD-q6-68G"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="eOt-vD-jk5" userLabel="Tap Timeline">
-                    <connections>
-                        <action selector="timelineTap:" destination="BYZ-38-t0r" id="0Pv-m5-ghK"/>
-                    </connections>
-                </tapGestureRecognizer>
-                <panGestureRecognizer minimumNumberOfTouches="1" id="5qt-4k-GCQ" userLabel="Pan Timeline">
-                    <connections>
-                        <action selector="timelineDrag:" destination="BYZ-38-t0r" id="JhU-Nj-9nP"/>
-                    </connections>
-                </panGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="356" y="420.44334975369458"/>
         </scene>

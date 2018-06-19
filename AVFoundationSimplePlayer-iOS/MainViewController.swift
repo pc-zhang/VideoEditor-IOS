@@ -16,10 +16,16 @@ import UIKit
  */
 private var MainViewControllerKVOContext = 0
 
-class MainViewController: UIViewController, CAAnimationDelegate {
+class MainViewController: UIViewController, UIScrollViewDelegate {
     // MARK: Properties
+
+    @IBOutlet weak var scrollview: UIScrollView! {
+        didSet{
+            scrollview.delegate = self
+        }
+    }
+    
     var seekTimer: Timer? = nil
-    var initialPos: CGFloat = 0
     var stack: [AVMutableComposition] = []
     var imageGenerator: AVAssetImageGenerator? = nil
     var undoPos: Int = -1 {
@@ -56,9 +62,6 @@ class MainViewController: UIViewController, CAAnimationDelegate {
     ]
     
     let player = AVPlayer()
-    
-    var timeline_original_x : CGFloat = 0.0
-    var timeline_original_width : CGFloat = 0.0
     
     var currentTime: Double {
         get {
@@ -119,7 +122,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
     @IBOutlet weak var startTimeLabel: UILabel!
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var playerView: PlayerView!
-    @IBOutlet weak var timeline: TimelineView!
+    @IBOutlet weak var timelineView: TimelineView!
     
     @IBOutlet weak var splitButton: UIButton!
     @IBOutlet weak var copyButton: UIButton!
@@ -157,10 +160,6 @@ class MainViewController: UIViewController, CAAnimationDelegate {
             self.startTimeLabel.text = self.createTimeString(time: timeElapsed)
         }
         
-        setAnchorPoint(anchorPoint: CGPoint(x: 0, y: 0), forView: timeline)
-        timeline_original_x = self.timeline.layer.position.x
-        timeline_original_width = self.timeline.bounds.width
-
         // add composition
         
         composition = AVMutableComposition()
@@ -214,7 +213,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
         return times;
     }
     
-    func updateMovieTimeline() {
+    func updateTimeline() {
         self.playerItem = AVPlayerItem(asset: self.composition!)
         self.playerItem!.videoComposition = self.videoComposition
         self.playerItem!.audioMix = self.audioMix
@@ -227,15 +226,19 @@ class MainViewController: UIViewController, CAAnimationDelegate {
 //        self.compositionDebugView.setNeedsDisplay()
         
         if kCMTimeZero != composition!.duration {
-            self.timeline.bounds.size.width = CGFloat(CMTimeGetSeconds(composition!.duration)) / 15 * timeline_original_width
-            let numberOfImagesNeeded = UInt(self.timeline.bounds.width / self.timeline.bounds.height)
+            scrollview.addSubview(timelineView)
+            timelineView.frame = CGRect(x: 0, y: 68, width: CGFloat(CMTimeGetSeconds(composition!.duration)) / 15 * scrollview.frame.size.width, height: 65)
+            scrollview.contentSize = timelineView.frame.size
+            scrollview.contentOffset = CGPoint(x:-scrollview.frame.width / 2, y:0)
+            scrollview.contentInset = UIEdgeInsets(top: 0, left: scrollview.frame.width/2, bottom: 0, right: scrollview.frame.width/2)
+            let numberOfImagesNeeded = UInt(self.timelineView.bounds.width / self.timelineView.bounds.height)
             let times = imageTimesForNumberOfImages(numberOfImages: numberOfImagesNeeded)
 
             imageGenerator?.cancelAllCGImageGeneration()
-            timeline.removeAllPositionalSubviews()
+            timelineView.removeAllPositionalSubviews()
 
             imageGenerator = AVAssetImageGenerator.init(asset: composition!)
-            imageGenerator?.maximumSize = CGSize(width: self.timeline.bounds.height * 2, height: self.timeline.bounds.height * 2)
+            imageGenerator?.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height * 2)
 
             // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
             imageGenerator?.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
@@ -243,7 +246,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
                     let croppedImage = image!.cropping(to: CGRect(x: (image!.width - image!.height)/2, y: 0, width: image!.height, height: image!.height))
                     let nextImage = UIImage.init(cgImage: croppedImage!)
                     DispatchQueue.main.async {
-                        self.timeline.addImageView(nextImage)
+                        self.timelineView.addImageView(nextImage)
                     }
                 } else {
                 }
@@ -306,7 +309,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
                 self.push()
                 
                 // update timeline
-                self.updateMovieTimeline()
+                self.updateTimeline()
             }
         }
     }
@@ -321,7 +324,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
         undoPos -= 1
         self.composition = stack[undoPos].mutableCopy() as! AVMutableComposition
         
-        updateMovieTimeline()
+        updateTimeline()
     }
     
     @IBAction func redo(_ sender: Any) {
@@ -332,7 +335,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
         undoPos += 1
         self.composition = stack[undoPos].mutableCopy() as! AVMutableComposition
         
-        updateMovieTimeline()
+        updateTimeline()
     }
     
     @IBAction func splitClip(_ sender: Any) {
@@ -352,7 +355,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
             }
         }
         
-        updateMovieTimeline()
+        updateTimeline()
         push()
 
 //        let filePath  = Bundle.main.path(forResource: "json", ofType:"txt")
@@ -375,7 +378,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
             }
         }
         
-        updateMovieTimeline()
+        updateTimeline()
         push()
 
     }
@@ -394,7 +397,7 @@ class MainViewController: UIViewController, CAAnimationDelegate {
             }
         }
         
-        updateMovieTimeline()
+        updateTimeline()
         push()
 
     }
@@ -409,95 +412,22 @@ class MainViewController: UIViewController, CAAnimationDelegate {
             
             player.play()
             
-            self.timeline.layer.removeAllAnimations()
-            self.timeline.layer.position.x = timeline_original_x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(player.currentTime())) / CGFloat(CMTimeGetSeconds(self.composition!.duration))
-            
-            let constVelocityAnim = CAKeyframeAnimation(keyPath: "position.x")
-            constVelocityAnim.calculationMode = kCAAnimationCubicPaced
-            constVelocityAnim.values = [self.timeline.layer.position.x, self.timeline.layer.position.x - self.timeline.frame.width]
-            constVelocityAnim.duration = CMTimeGetSeconds((composition!.duration))
-            self.timeline.layer.add(constVelocityAnim, forKey: "position.x")
-        }
-        else {
-            // Playing, so pause.
-            player.pause()
-            
-            self.timeline.layer.removeAllAnimations()
-            self.timeline.layer.position.x = timeline_original_x - self.timeline.frame.width * CGFloat(CMTimeGetSeconds(player.currentTime())) / CGFloat(CMTimeGetSeconds(self.composition!.duration))
-        }
-    }
-    
-    @IBAction func rewindButtonWasPressed(_ sender: UIButton) {
-        // Rewind no faster than -2.0.
-        rate = max(player.rate - 2.0, -2.0)
-    }
-    
-    @IBAction func fastForwardButtonWasPressed(_ sender: UIButton) {
-        // Fast forward no faster than 2.0.
-        rate = min(player.rate + 2.0, 2.0)
-    }
-    
-    @IBAction func timeSliderDidChange(_ sender: UISlider) {
-        currentTime = Double(sender.value)
-    }
-    
-    
-    @IBAction func timelineTap(_ sender: UITapGestureRecognizer) {
-        
-    }
-    
-    @IBAction func timelineDrag(_ gestureRecognizer : UIPanGestureRecognizer) {
-        guard gestureRecognizer.view != nil else {return}
-        //        playPauseButtonWasPressed()
-        let piece = gestureRecognizer.view!
-        // Get the changes in the X and Y directions relative to
-        // the superview's coordinate space.
-        let translation = gestureRecognizer.translation(in: piece.superview)
-        if gestureRecognizer.state == .began {
-            self.player.pause()
-            self.timeline.layer.removeAllAnimations()
-            // Save the view's original position.
-            
-            self.initialPos = piece.layer.position.x
-            
-        }
-        // Update the position for the .began, .changed, and .ended states
-        if gestureRecognizer.state != .cancelled && gestureRecognizer.state != .ended {
-            // Add the X and Y translation to the view's original position.
-            piece.layer.position.x = self.initialPos + translation.x
-            self.currentTime = Double(self.timeline_original_x - self.timeline.layer.position.x) / Double(self.timeline.layer.frame.width) * CMTimeGetSeconds(self.composition!.duration)
-        }else if gestureRecognizer.state == .ended {
-            let v = gestureRecognizer.velocity(in: piece).x
-            
-            let decVelocityAnim = CAKeyframeAnimation(keyPath: "position.x")
-            decVelocityAnim.delegate = self
-            decVelocityAnim.calculationMode = kCAAnimationCubic
-            let init_x = self.timeline.layer.position.x
-            decVelocityAnim.values = [init_x,
-                                      init_x + CGFloat(0.25*v),
-                                      init_x + CGFloat(0.45*v),
-                                      init_x + CGFloat(0.5*v),
-                                      init_x + CGFloat(0.45*v),
-                                      init_x + CGFloat(0.25*v),
-                                      init_x]
-            decVelocityAnim.keyTimes = [0,0.2,0.5,1,1.5,1.8,2]
-            
-            decVelocityAnim.duration = 2.5
-            self.timeline.layer.add(decVelocityAnim, forKey: "position.x")
-            
             if #available(iOS 10.0, *) {
                 seekTimer?.invalidate()
                 seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { (timer) in
-                    self.currentTime = Double(self.timeline_original_x - self.timeline.layer.position.x) / Double(self.timeline.layer.frame.width) * CMTimeGetSeconds(self.composition!.duration)
+                    self.scrollview.contentOffset.x = CGFloat(self.currentTime/CMTimeGetSeconds(self.composition!.duration)*Double(self.timelineView.frame.width)) - self.scrollview.frame.size.width/2
                 })
             } else {
                 // Fallback on earlier versions
             }
         }
         else {
-            // On cancellation, return the piece to its original location.
+            // Playing, so pause.
+            player.pause()
+            seekTimer?.invalidate()
         }
     }
+    
     
     // MARK: - KVO Observation
     
@@ -636,23 +566,6 @@ class MainViewController: UIViewController, CAAnimationDelegate {
         return newImage!
     }
     
-    func setAnchorPoint(anchorPoint: CGPoint, forView view: UIView) {
-        var newPoint = CGPoint(x: view.bounds.width * anchorPoint.x, y: view.bounds.height * anchorPoint.y)
-        var oldPoint = CGPoint(x: view.bounds.width * view.layer.anchorPoint.x, y: view.bounds.height * view.layer.anchorPoint.y)
-        
-        newPoint = newPoint.applying(view.transform)
-        oldPoint = oldPoint.applying(view.transform)
-        
-        var position = view.layer.position
-        position.x -= oldPoint.x
-        position.x += newPoint.x
-        
-        position.y -= oldPoint.y
-        position.y += newPoint.y
-        
-        view.layer.position = position
-        view.layer.anchorPoint = anchorPoint
-    }
     
     func createTimeString(time: Float) -> String {
         let components = NSDateComponents()
@@ -662,9 +575,14 @@ class MainViewController: UIViewController, CAAnimationDelegate {
     }
     
     // MARK: Delegate
-    
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        self.seekTimer?.invalidate()
-    }
 
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return timelineView
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if player.rate == 0 {
+            self.currentTime = Double(scrollview.contentOffset.x + scrollview.frame.size.width/2) / Double(self.timelineView.layer.frame.width) * CMTimeGetSeconds(self.composition!.duration)
+        }
+    }
 }
