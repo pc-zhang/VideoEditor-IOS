@@ -20,32 +20,6 @@ let kGapAfterRows:CGFloat = 4
 
 
 class TimelineView : UIView {
-    
-    var imagesAdded: Int! = 0
-    
-    func removeAllPositionalSubviews() {
-        for subView in self.subviews.enumerated() {
-            subView.element.removeFromSuperview()
-        }
-        
-        self.imagesAdded = 0
-    }
-    
-    func addImageView(_ cgImage: CGImage!) {
-        let image = UIImage.init(cgImage: cgImage)
-
-        let nextX = CGFloat(self.imagesAdded) * self.bounds.height
-        let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: self.bounds.height, height: self.bounds.height))
-        nextView.contentMode = .scaleAspectFill
-        nextView.clipsToBounds = true
-        
-        nextView.image = image
-        self.addSubview(nextView)
-        self.setNeedsDisplay(self.frame)
-        
-        self.imagesAdded = self.imagesAdded + 1
-    }
-    
     var drawingLayer: CALayer? = nil
     var duration: CMTime? = nil
     var compositionRectWidth: CGFloat = 0.0
@@ -65,20 +39,6 @@ class TimelineView : UIView {
         super.init(coder: aDecoder)
         //        fatalError("init(coder:) has not been implemented")
     }
-    
-    override func willMove(toSuperview newSuperview: UIView?) {
-        drawingLayer?.frame = self.bounds
-        drawingLayer?.delegate = self
-        drawingLayer?.setNeedsDisplay()
-    }
-    
-    
-    //    func drawVerticallyCenteredInRect(_ rect: CGRect, withAttributes attributes:NSDictionary) -> Void
-    //    {
-    //        CGSize size = [self sizeWithAttributes:attributes]
-    //        rect.origin.y += (rect.size.height - size.height) / 2.0
-    //        [self drawInRect:rect withAttributes:attributes]
-    //    }
     
     func horizontalPositionForTime(time:CMTime)->Double
     {

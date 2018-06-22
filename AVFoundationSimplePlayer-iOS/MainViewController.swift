@@ -170,6 +170,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         scrollview.contentOffset = CGPoint(x:-scrollview.frame.width / 2, y:0)
         scrollview.contentInset = UIEdgeInsets(top: 0, left: scrollview.frame.width/2, bottom: 0, right: scrollview.frame.width/2)
         
+        scaledDurationToWidth = scrollview.frame.width / 30
+        
         addClip()
     }
     
@@ -190,30 +192,6 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     
     // MARK: todo
     
-    func imageTimesForNumberOfImages(minX minX:CGFloat, maxX maxX:CGFloat) -> [NSValue] {
-        let movieSeconds = CMTimeGetSeconds((composition?.duration)!)
-        let incrementSeconds = movieSeconds / Double((maxX-minX)/timelineView.bounds.height)
-        let movieDuration = composition?.duration
-    
-        let incrementTime = CMTimeMakeWithSeconds(incrementSeconds, 1000);
-        var times = [NSValue]();
-    
-        // Generate an image at time zero.
-        var startTime = CMTime(seconds: Double(minX / scaledDurationToWidth), preferredTimescale: 1)
-        
-        while startTime <= movieDuration! {
-            var nextValue = startTime as NSValue;
-            if startTime == movieDuration {
-                // Ensure that one image is always the last image in the movie.
-                nextValue = movieDuration as! NSValue;
-            }
-            times.append(nextValue)
-            startTime = CMTimeAdd(startTime, incrementTime);
-        }
-    
-        return times;
-    }
-    
     func updateTimeline() {
         if composition == nil {
             return
@@ -224,10 +202,13 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         self.playerItem!.audioMix = self.audioMix
         self.player.replaceCurrentItem(with: self.playerItem)
         
-        timelineView.removeAllPositionalSubviews()
+        self.currentTime = Double((scrollview.contentOffset.x + scrollview.frame.width/2) / scaledDurationToWidth)
+        
+        for subview in timelineView.subviews {
+            subview.removeFromSuperview()
+        }
         
         if kCMTimeZero != composition!.duration {
-            scaledDurationToWidth = scrollview.frame.width / 30
             timelineView.frame.size = CGSize(width: CGFloat(CMTimeGetSeconds(composition!.duration)) * scaledDurationToWidth, height: timelineView.frame.height)
             scrollview.contentSize = timelineView.frame.size
             
@@ -247,78 +228,43 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 timelineView.addSubview(segmentView)
                 segmentView.clipsToBounds = true
                 
-                let times = imageTimesForNumberOfImages(minX:segmentView.frame.minX, maxX:segmentView.frame.maxX )
-    
-                // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
-                imageGenerator?.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
-                    if (image != nil) {
-                        DispatchQueue.main.async {
-                            let nextX = CGFloat(segmentView.subviews.count) * segmentView.bounds.height
-                            let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: segmentView.bounds.height, height: segmentView.bounds.height))
-                            nextView.contentMode = .scaleAspectFill
-                            nextView.clipsToBounds = true
-                            nextView.image = UIImage.init(cgImage: image!)
-                            
-                            segmentView.addSubview(nextView)
-                            segmentView.setNeedsDisplay()
+                if segment.timeMapping.source.intersection(CMTimeRange(start: CMTime(seconds: currentTime-15, preferredTimescale: 1), end: CMTime(seconds: currentTime+15, preferredTimescale: 1))).isEmpty != true {
+                    var times = [NSValue]()
+                    
+                    // Generate an image at time zero.
+                    let startTime = CMTime(seconds: Double(segmentRect.minX / scaledDurationToWidth), preferredTimescale: 60)
+                    let endTime = CMTime(seconds: Double(segmentRect.maxX / scaledDurationToWidth), preferredTimescale: 60)
+                    let incrementTime = CMTime(seconds: Double(segmentRect.height /  scaledDurationToWidth), preferredTimescale: 60)
+                    
+                    var iterTime = startTime
+                    
+                    while iterTime <= endTime {
+                        times.append(iterTime as NSValue)
+                        iterTime = CMTimeAdd(iterTime, incrementTime);
+                    }
+                    
+                    // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
+                    imageGenerator?.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
+                        if (image != nil) {
+                            DispatchQueue.main.async {
+                                let nextX = CGFloat(segmentView.subviews.count) * segmentView.bounds.height
+                                let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: segmentView.bounds.height, height: segmentView.bounds.height))
+                                nextView.contentMode = .scaleAspectFill
+                                nextView.clipsToBounds = true
+                                nextView.image = UIImage.init(cgImage: image!)
+                                
+                                segmentView.addSubview(nextView)
+                                segmentView.setNeedsDisplay()
+                            }
                         }
-                    } else {
                     }
                 }
+                
                 
                 segmentRect.origin.x += segmentRect.size.width;
             }
         }
         
-        self.currentTime = Double(scrollview.contentOffset.x + scrollview.frame.width/2) / Double(self.timelineView.frame.width) * CMTimeGetSeconds(self.composition!.duration)
-        
-//        if (composition != nil) {
-//            self.layer.sublayers = nil
-//            var currentTimeRect = self.layer.bounds
-//
-//            // The red band of the timeMaker will be 8 pixels wide
-//            currentTimeRect.origin.x = 0
-//            currentTimeRect.size.width = 8
-//
-//            var timeMarkerRedBandLayer = CAShapeLayer()
-//            timeMarkerRedBandLayer.frame = currentTimeRect
-//            timeMarkerRedBandLayer.position = CGPoint(x:rowRect.origin.x, y:self.bounds.size.height / 2)
-//            let linePath = CGPath(rect: currentTimeRect, transform: nil)
-//            timeMarkerRedBandLayer.fillColor = #colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.5)
-//            timeMarkerRedBandLayer.path = linePath
-//
-//            currentTimeRect.origin.x = 0
-//            currentTimeRect.size.width = 1
-//
-//            // Position the white line layer of the timeMarker at the center of the red band layer
-//            var timeMarkerWhiteLineLayer = CAShapeLayer()
-//            timeMarkerWhiteLineLayer.frame = currentTimeRect
-//            timeMarkerWhiteLineLayer.position = CGPoint(x:4, y:self.bounds.size.height / 2)
-//            let whiteLinePath = CGPath(rect: currentTimeRect, transform: nil)
-//            timeMarkerWhiteLineLayer.fillColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-//            timeMarkerWhiteLineLayer.path = whiteLinePath
-//
-//            // Add the white line layer to red band layer, by doing so we can only animate the red band layer which in turn animates its sublayers
-//            timeMarkerRedBandLayer.addSublayer(timeMarkerWhiteLineLayer)
-//
-//            // This scrubbing animation controls the x position of the timeMarker
-//            // On the left side it is bound to where the first segment rectangle of the composition starts
-//            // On the right side it is bound to where the last segment rectangle of the composition ends
-//            // Playback at rate 1.0 would take the timeMarker "duration" time to reach from one end to the other, that is marked as the duration of the animation
-//            let scrubbingAnimation = CABasicAnimation(keyPath: "position.x")
-//            scrubbingAnimation.fromValue = horizontalPositionForTime(time: kCMTimeZero)
-//            scrubbingAnimation.toValue = horizontalPositionForTime(time: (composition?.duration)!)
-//            scrubbingAnimation.isRemovedOnCompletion = false
-//            scrubbingAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
-//            scrubbingAnimation.duration = CMTimeGetSeconds((composition?.duration)!)
-//            scrubbingAnimation.fillMode = kCAFillModeBoth
-//            timeMarkerRedBandLayer.add(scrubbingAnimation, forKey: nil)
-//
-//            // We add the red band layer along with the scrubbing animation to a AVSynchronizedLayer to have precise timing information
-//            let syncLayer = AVSynchronizedLayer(playerItem: self.player.currentItem!)
-//            syncLayer.addSublayer(timeMarkerRedBandLayer)
-//            self.layer.addSublayer(syncLayer)
-//        }
     }
     
     // MARK: - IBActions
@@ -411,7 +357,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
-            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
+            timeRangeInAsset = s.timeMapping.source; // assumes non-scaled edit
             
             if timeRangeInAsset!.containsTime(player.currentTime()) {
                 try! self.composition!.insertTimeRange(timeRangeInAsset!, of: composition!, at: timeRangeInAsset!.end)
@@ -436,7 +382,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
-            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
+            timeRangeInAsset = s.timeMapping.source; // assumes non-scaled edit
             
             if timeRangeInAsset!.containsTime(player.currentTime()) {
                 try! self.composition!.insertTimeRange(timeRangeInAsset!, of: composition!, at: timeRangeInAsset!.end)
@@ -455,7 +401,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
-            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
+            timeRangeInAsset = s.timeMapping.source; // assumes non-scaled edit
             
             if timeRangeInAsset!.containsTime(player.currentTime()) {
                 try! self.composition!.removeTimeRange(timeRangeInAsset!)
