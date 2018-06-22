@@ -193,12 +193,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     
     // MARK: todo
     
-    func updateTimeline() {
+    func updateTimeline(timeRange: CMTimeRange) {
         lastCenterTime = currentTime
-        
-        for subview in timelineView.subviews {
-            subview.removeFromSuperview()
-        }
         
         if kCMTimeZero != composition!.duration {
             timelineView.frame.size = CGSize(width: CGFloat(CMTimeGetSeconds(composition!.duration)) * scaledDurationToWidth, height: timelineView.frame.height)
@@ -208,7 +204,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
             
             imageGenerator?.cancelAllCGImageGeneration()
             imageGenerator = AVAssetImageGenerator.init(asset: composition!)
-            imageGenerator?.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height * 2)
+            imageGenerator?.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height)
             
             var segmentRect = CGRect(origin: CGPoint(x:0,y:0), size: timelineView.frame.size)
             for segment in (compositionVideoTrack?.segments)! {
@@ -231,7 +227,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                     var iterTime = startTime
                     
                     while iterTime <= endTime {
-                        if CMTimeRange(start: CMTime(seconds: currentTime-60, preferredTimescale: 1), end: CMTime(seconds: currentTime+60, preferredTimescale: 1)).containsTime(iterTime) {
+                        if timeRange.containsTime(iterTime) {
                             times.append(iterTime as NSValue)
                         }
                         iterTime = CMTimeAdd(iterTime, incrementTime);
@@ -272,7 +268,11 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         
         currentTime = Double((scrollview.contentOffset.x + scrollview.frame.width/2) / scaledDurationToWidth)
         
-        updateTimeline()
+        for subview in timelineView.subviews {
+            subview.removeFromSuperview()
+        }
+        
+        updateTimeline(timeRange: CMTimeRange(start: CMTime(seconds: currentTime-30, preferredTimescale: 1), end: CMTime(seconds: currentTime+30, preferredTimescale: 1)))
     }
     
     // MARK: - IBActions
@@ -604,8 +604,10 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if player.rate == 0 {
             currentTime = Double(scrollview.contentOffset.x + scrollview.frame.width/2) / Double(timelineView.frame.width) * CMTimeGetSeconds(composition!.duration)
-            if abs(currentTime-lastCenterTime) > 15 {
-                updateTimeline()
+            if currentTime-lastCenterTime > 15 {
+                updateTimeline(timeRange: CMTimeRange(start: CMTime(seconds: currentTime+15, preferredTimescale: 1), end: CMTime(seconds: currentTime+30, preferredTimescale: 1)))
+            }else if currentTime-lastCenterTime < -15 {
+                updateTimeline(timeRange: CMTimeRange(start: CMTime(seconds: currentTime-30, preferredTimescale: 1), end: CMTime(seconds: currentTime-15, preferredTimescale: 1)))
             }
         }
     }
