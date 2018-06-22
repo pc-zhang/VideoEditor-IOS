@@ -26,6 +26,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     }
     
     var seekTimer: Timer? = nil
+    var lastCenterTime: Double = 0
     var scaledDurationToWidth: CGFloat = 0
     var imageGenerator: AVAssetImageGenerator? = nil
     var stack: [AVMutableComposition] = []
@@ -193,16 +194,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     // MARK: todo
     
     func updateTimeline() {
-        if composition == nil {
-            return
-        }
-        
-        self.playerItem = AVPlayerItem(asset: self.composition!)
-        self.playerItem!.videoComposition = self.videoComposition
-        self.playerItem!.audioMix = self.audioMix
-        self.player.replaceCurrentItem(with: self.playerItem)
-        
-        self.currentTime = Double((scrollview.contentOffset.x + scrollview.frame.width/2) / scaledDurationToWidth)
+        lastCenterTime = currentTime
         
         for subview in timelineView.subviews {
             subview.removeFromSuperview()
@@ -228,7 +220,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 timelineView.addSubview(segmentView)
                 segmentView.clipsToBounds = true
                 
-                if segment.timeMapping.source.intersection(CMTimeRange(start: CMTime(seconds: currentTime-15, preferredTimescale: 1), end: CMTime(seconds: currentTime+15, preferredTimescale: 1))).isEmpty != true {
+                if true {
                     var times = [NSValue]()
                     
                     // Generate an image at time zero.
@@ -239,7 +231,9 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                     var iterTime = startTime
                     
                     while iterTime <= endTime {
-                        times.append(iterTime as NSValue)
+                        if CMTimeRange(start: CMTime(seconds: currentTime-60, preferredTimescale: 1), end: CMTime(seconds: currentTime+60, preferredTimescale: 1)).containsTime(iterTime) {
+                            times.append(iterTime as NSValue)
+                        }
                         iterTime = CMTimeAdd(iterTime, incrementTime);
                     }
                     
@@ -247,7 +241,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                     imageGenerator?.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
                         if (image != nil) {
                             DispatchQueue.main.async {
-                                let nextX = CGFloat(segmentView.subviews.count) * segmentView.bounds.height
+                                let nextX = CGFloat(CMTimeGetSeconds(requestedTime - startTime)) * self.scaledDurationToWidth
                                 let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: segmentView.bounds.height, height: segmentView.bounds.height))
                                 nextView.contentMode = .scaleAspectFill
                                 nextView.clipsToBounds = true
@@ -264,7 +258,21 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 segmentRect.origin.x += segmentRect.size.width;
             }
         }
+    }
+    
+    func updatePlayerAndTimeline() {
+        if composition == nil {
+            return
+        }
         
+        playerItem = AVPlayerItem(asset: composition!)
+        playerItem!.videoComposition = videoComposition
+        playerItem!.audioMix = audioMix
+        player.replaceCurrentItem(with: playerItem)
+        
+        currentTime = Double((scrollview.contentOffset.x + scrollview.frame.width/2) / scaledDurationToWidth)
+        
+        updateTimeline()
     }
     
     // MARK: - IBActions
@@ -323,7 +331,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 self.push()
                 
                 // update timeline
-                self.updateTimeline()
+                self.updatePlayerAndTimeline()
             }
         }
     }
@@ -337,7 +345,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         undoPos -= 1
         self.composition = stack[undoPos].mutableCopy() as! AVMutableComposition
         
-        updateTimeline()
+        updatePlayerAndTimeline()
     }
     
     @IBAction func redo(_ sender: Any) {
@@ -348,7 +356,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         undoPos += 1
         self.composition = stack[undoPos].mutableCopy() as! AVMutableComposition
         
-        updateTimeline()
+        updatePlayerAndTimeline()
     }
     
     @IBAction func splitClip(_ sender: Any) {
@@ -368,7 +376,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
             }
         }
         
-        updateTimeline()
+        updatePlayerAndTimeline()
         push()
 
 //        let filePath  = Bundle.main.path(forResource: "json", ofType:"txt")
@@ -391,7 +399,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
             }
         }
         
-        updateTimeline()
+        updatePlayerAndTimeline()
         push()
 
     }
@@ -410,7 +418,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
             }
         }
         
-        updateTimeline()
+        updatePlayerAndTimeline()
         push()
 
     }
@@ -595,7 +603,10 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if player.rate == 0 {
-            self.currentTime = Double(scrollview.contentOffset.x + scrollview.frame.width/2) / Double(self.timelineView.frame.width) * CMTimeGetSeconds(self.composition!.duration)
+            currentTime = Double(scrollview.contentOffset.x + scrollview.frame.width/2) / Double(timelineView.frame.width) * CMTimeGetSeconds(composition!.duration)
+            if abs(currentTime-lastCenterTime) > 15 {
+                updateTimeline()
+            }
         }
     }
 }
