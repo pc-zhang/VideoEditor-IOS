@@ -41,6 +41,7 @@
 		F06132DF20BC4DEE000039B4 /* fullscreen.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullscreen.PNG; sourceTree = "<group>"; };
 		F06132E120BC59B3000039B4 /* pausebutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pausebutton.png; sourceTree = "<group>"; };
 		F06132E220BC59B4000039B4 /* playbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playbutton.png; sourceTree = "<group>"; };
+		F06E72D220DCDD0D00A0D94F /* test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F078682620C28BB100861244 /* split.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = split.png; sourceTree = "<group>"; };
 		F078682720C28BB200861244 /* copy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = copy.png; sourceTree = "<group>"; };
 		F078682820C28BB200861244 /* remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = remove.png; sourceTree = "<group>"; };
@@ -54,6 +55,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		D2385B3F1AF5181400DC8ADE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F06E72CF20DCDD0D00A0D94F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -75,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				D2385B421AF5181400DC8ADE /* AVFoundationSimplePlayer-Swift.app */,
+				F06E72D220DCDD0D00A0D94F /* test.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -142,6 +151,23 @@
 			productReference = D2385B421AF5181400DC8ADE /* AVFoundationSimplePlayer-Swift.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F06E72D120DCDD0D00A0D94F /* test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F06E72E320DCDD0F00A0D94F /* Build configuration list for PBXNativeTarget "test" */;
+			buildPhases = (
+				F06E72CE20DCDD0D00A0D94F /* Sources */,
+				F06E72CF20DCDD0D00A0D94F /* Frameworks */,
+				F06E72D020DCDD0D00A0D94F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = test;
+			productName = test;
+			productReference = F06E72D220DCDD0D00A0D94F /* test.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -156,6 +182,11 @@
 						CreatedOnToolsVersion = 7.0;
 						DevelopmentTeam = 5K87F3JL7S;
 						LastSwiftMigration = 0930;
+					};
+					F06E72D120DCDD0D00A0D94F = {
+						CreatedOnToolsVersion = 9.4;
+						DevelopmentTeam = 5K87F3JL7S;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -173,6 +204,7 @@
 			projectRoot = "";
 			targets = (
 				D2385B411AF5181400DC8ADE /* AVFoundationSimplePlayer-iOS */,
+				F06E72D120DCDD0D00A0D94F /* test */,
 			);
 		};
 /* End PBXProject section */
@@ -200,6 +232,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F06E72D020DCDD0D00A0D94F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -211,6 +250,13 @@
 				F02B66D920C1020700E879FE /* TimelineView.swift in Sources */,
 				D2385B461AF5181400DC8ADE /* AppDelegate.swift in Sources */,
 				D20EB3C21AF94FDE0059CD72 /* MainViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F06E72CE20DCDD0D00A0D94F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,6 +422,55 @@
 			};
 			name = Release;
 		};
+		F06E72E120DCDD0F00A0D94F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 5K87F3JL7S;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = zpc.test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F06E72E220DCDD0F00A0D94F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5K87F3JL7S;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = zpc.test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -393,6 +488,15 @@
 			buildConfigurations = (
 				D2385B601AF5181400DC8ADE /* Debug */,
 				D2385B611AF5181400DC8ADE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F06E72E320DCDD0F00A0D94F /* Build configuration list for PBXNativeTarget "test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F06E72E120DCDD0F00A0D94F /* Debug */,
+				F06E72E220DCDD0F00A0D94F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

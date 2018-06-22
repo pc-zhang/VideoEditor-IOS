@@ -31,9 +31,13 @@ class TimelineView : UIView {
         self.imagesAdded = 0
     }
     
-    func addImageView(_ image: UIImage!) {
+    func addImageView(_ cgImage: CGImage!) {
+        let image = UIImage.init(cgImage: cgImage)
+
         let nextX = CGFloat(self.imagesAdded) * self.bounds.height
         let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: self.bounds.height, height: self.bounds.height))
+        nextView.contentMode = .scaleAspectFill
+        nextView.clipsToBounds = true
         
         nextView.image = image
         self.addSubview(nextView)
