@@ -395,7 +395,7 @@
 				DEVELOPMENT_TEAM = 5K87F3JL7S;
 				INFOPLIST_FILE = "AVFoundationSimplePlayer-iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.Interactive-Content5K87F3JL7S";
+				PRODUCT_BUNDLE_IDENTIFIER = com.zpc.oneCut;
 				PRODUCT_NAME = "AVFoundationSimplePlayer-Swift";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
@@ -413,7 +413,7 @@
 				DEVELOPMENT_TEAM = 5K87F3JL7S;
 				INFOPLIST_FILE = "AVFoundationSimplePlayer-iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.Interactive-Content5K87F3JL7S";
+				PRODUCT_BUNDLE_IDENTIFIER = com.zpc.oneCut;
 				PRODUCT_NAME = "AVFoundationSimplePlayer-Swift";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
