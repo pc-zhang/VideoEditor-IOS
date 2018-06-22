@@ -26,6 +26,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     }
     
     var seekTimer: Timer? = nil
+    var scaledDurationToWidth: CGFloat = 0
+    var imageGenerator: AVAssetImageGenerator? = nil
     var stack: [AVMutableComposition] = []
     var undoPos: Int = -1 {
         didSet {
@@ -196,7 +198,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         var times = [NSValue]();
     
         // Generate an image at time zero.
-        var startTime = kCMTimeZero;
+        var startTime = CMTime(seconds: Double(minX / scaledDurationToWidth), preferredTimescale: 1)
+        
         while startTime <= movieDuration! {
             var nextValue = startTime as NSValue;
             if startTime == movieDuration {
@@ -223,11 +226,15 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         timelineView.removeAllPositionalSubviews()
         
         if kCMTimeZero != composition!.duration {
-            let scaledDurationToWidth = scrollview.frame.width / 30
+            scaledDurationToWidth = scrollview.frame.width / 30
             timelineView.frame.size = CGSize(width: CGFloat(CMTimeGetSeconds(composition!.duration)) * scaledDurationToWidth, height: timelineView.frame.height)
             scrollview.contentSize = timelineView.frame.size
             
             let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
+            
+            imageGenerator?.cancelAllCGImageGeneration()
+            imageGenerator = AVAssetImageGenerator.init(asset: composition!)
+            imageGenerator?.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height * 2)
             
             var segmentRect = CGRect(origin: CGPoint(x:0,y:0), size: timelineView.frame.size)
             for segment in (compositionVideoTrack?.segments)! {
@@ -239,17 +246,20 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 timelineView.addSubview(segmentView)
                 segmentView.clipsToBounds = true
                 
-                let numberOfImagesNeeded = UInt(self.timelineView.bounds.width /    self.timelineView.bounds.height)
                 let times = imageTimesForNumberOfImages(minX:segmentView.frame.minX, maxX:segmentView.frame.maxX )
-                
-                var imageGenerator = AVAssetImageGenerator.init(asset: composition!)
-                imageGenerator.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height * 2)
     
                 // Set a videoComposition on the ImageGenerator if the underlying movie has more than 1 video track.
-                imageGenerator.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
+                imageGenerator?.generateCGImagesAsynchronously(forTimes: times as [NSValue]) { (requestedTime, image, actualTime, result, error) in
                     if (image != nil) {
                         DispatchQueue.main.async {
-                            self.timelineView.addImageView(image)
+                            let nextX = CGFloat(segmentView.subviews.count) * segmentView.bounds.height
+                            let nextView = UIImageView.init(frame: CGRect(x: nextX, y: 0.0, width: segmentView.bounds.height, height: segmentView.bounds.height))
+                            nextView.contentMode = .scaleAspectFill
+                            nextView.clipsToBounds = true
+                            nextView.image = UIImage.init(cgImage: image!)
+                            
+                            segmentView.addSubview(nextView)
+                            segmentView.setNeedsDisplay()
                         }
                     } else {
                     }
