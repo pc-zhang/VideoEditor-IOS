@@ -165,6 +165,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         
         _ = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
         
+        timelineView.backgroundColor = #colorLiteral(red: 1, green: 0, blue: 0, alpha: 0)
         scrollview.contentSize = timelineView.frame.size
         scrollview.contentOffset = CGPoint(x:-scrollview.frame.width / 2, y:0)
         scrollview.contentInset = UIEdgeInsets(top: 0, left: scrollview.frame.width/2, bottom: 0, right: scrollview.frame.width/2)
@@ -242,7 +243,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 
                 let segmentView = UIView(frame: segmentRect)
                 segmentView.frame = segmentView.frame.insetBy(dx: 1, dy: 0)
-                segmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+                segmentView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0)
                 timelineView.addSubview(segmentView)
                 segmentView.clipsToBounds = true
                 
