@@ -66,6 +66,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         
         stack.append(opsAndComps(comp: newComposition, op: op))
         undoPos = stack.count - 1
+        
+        redoOp(op: op)
     }
     
     // Attempt load and test these asset keys before playing.
@@ -213,7 +215,6 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func validateTimeline() {
-        lastCenterTime = currentTime
         
         if kCMTimeZero != composition!.duration {
             timelineView.frame.size = CGSize(width: CGFloat(CMTimeGetSeconds(composition!.duration)) * scaledDurationToWidth, height: timelineView.frame.height)
@@ -224,6 +225,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
             imageGenerator?.cancelAllCGImageGeneration()
             imageGenerator = AVAssetImageGenerator.init(asset: composition!)
             imageGenerator?.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height)
+            
+            assert(compositionVideoTrack?.segments.count == timelineView.subviews.count)
             
             for segment in (compositionVideoTrack?.segments)! {
                 let segmentRect = CGRect(x:CGFloat(CMTimeGetSeconds(segment.timeMapping.target.start)) * scaledDurationToWidth, y:0, width:CGFloat(CMTimeGetSeconds(segment.timeMapping.target.duration)) * scaledDurationToWidth, height:timelineView.frame.height).insetBy(dx: 1, dy: 0)
@@ -292,6 +295,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         
         currentTime = Double((scrollview.contentOffset.x + scrollview.frame.width/2) / scaledDurationToWidth)
         
+        lastCenterTime = currentTime
+
         validateTimeline()
     }
     
@@ -353,13 +358,6 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                     
                     let segmentRect = CGRect(x: 0, y: 0, width: self.scaledDurationToWidth * CGFloat(CMTimeGetSeconds(newAsset.duration)), height: self.timelineView.frame.height)
                     
-                    let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
-                    
-                    newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-                    newSegmentView.clipsToBounds = true
-                    
-                    self.timelineView.addSubview(newSegmentView)
-                    
                     self.push(op:.add(segmentRect))
 
                 } else {
@@ -371,20 +369,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                             
                             let segmentRect = CGRect(x: self.scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset.start)), y: 0, width: self.scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset.duration)), height: self.timelineView.frame.height)
                             
-                            for subview in self.timelineView.subviews {
-                                if subview.frame.minX > segmentRect.maxX {
-                                    subview.frame.origin.x += segmentRect.width
-                                }
-                            }
                             
                             let newSegmentRect = CGRect(x: segmentRect.maxX, y: 0, width: self.scaledDurationToWidth * CGFloat(CMTimeGetSeconds(newAsset.duration)), height: self.timelineView.frame.height)
-                            
-                            let newSegmentView = UIView(frame: newSegmentRect.insetBy(dx: 1, dy: 0))
-                            
-                            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-                            newSegmentView.clipsToBounds = true
-                            
-                            self.timelineView.addSubview(newSegmentView)
                             
                             self.push(op:.add(newSegmentRect))
                             
@@ -400,13 +386,63 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         }
     }
     
-    
-    @IBAction func undo(_ sender: Any) {
-        if undoPos <= 0 {
-            return
+    func redoOp(op: OpType) {
+        switch op {
+        case let .copy(segmentRect):
+            for subview in timelineView.subviews {
+                if subview.frame.minX > segmentRect.maxX {
+                    subview.frame.origin.x += segmentRect.width
+                }
+            }
+            let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
+            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+            newSegmentView.clipsToBounds = true
+            newSegmentView.frame.origin.x += segmentRect.width
+            timelineView.addSubview(newSegmentView)
+        case let .split(segmentRect, newSegmentRect):
+            for subview in timelineView.subviews {
+                if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
+                    subview.frame.size.width = segmentRect.width - newSegmentRect.width - 2
+                }
+            }
+            
+            
+            let newSegmentView = UIView(frame: newSegmentRect.insetBy(dx: 1, dy: 0))
+            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+            newSegmentView.clipsToBounds = true
+            
+            timelineView.addSubview(newSegmentView)
+        case let .add(segmentRect):
+            for subview in self.timelineView.subviews {
+                if subview.frame.minX >= segmentRect.minX {
+                    subview.frame.origin.x += segmentRect.width
+                }
+            }
+            
+            let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
+            
+            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+            newSegmentView.clipsToBounds = true
+            
+            self.timelineView.addSubview(newSegmentView)
+            
+            break
+            
+        case let .remove(segmentRect):
+            for subview in timelineView.subviews {
+                if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
+                    subview.removeFromSuperview()
+                } else if subview.frame.minX > segmentRect.maxX {
+                    subview.frame.origin.x -= segmentRect.width
+                }
+            }
+        default:
+            _ = 1
         }
-        
-        switch stack[undoPos].op {
+    }
+    
+    func undoOp(op: OpType) {
+        switch op {
         case let .copy(segmentRect):
             for subview in timelineView.subviews {
                 if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
@@ -457,6 +493,14 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         default:
             _ = 1
         }
+    }
+    
+    @IBAction func undo(_ sender: Any) {
+        if undoPos <= 0 {
+            return
+        }
+        
+        undoOp(op: stack[undoPos].op)
         
         undoPos -= 1
         self.composition = stack[undoPos].comp.mutableCopy() as! AVMutableComposition
@@ -472,58 +516,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         undoPos += 1
         self.composition = stack[undoPos].comp.mutableCopy() as! AVMutableComposition
         
-        switch stack[undoPos].op {
-        case let .copy(segmentRect):
-            for subview in timelineView.subviews {
-                if subview.frame.minX > segmentRect.maxX {
-                    subview.frame.origin.x += segmentRect.width
-                }
-            }
-            let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
-            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-            newSegmentView.clipsToBounds = true
-            newSegmentView.frame.origin.x += segmentRect.width
-            timelineView.addSubview(newSegmentView)
-        case let .split(segmentRect, newSegmentRect):
-            for subview in timelineView.subviews {
-                if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
-                    subview.frame.size.width = segmentRect.width - newSegmentRect.width - 2
-                }
-            }
-            
-            
-            let newSegmentView = UIView(frame: newSegmentRect.insetBy(dx: 1, dy: 0))
-            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-            newSegmentView.clipsToBounds = true
-            
-            timelineView.addSubview(newSegmentView)
-        case let .add(segmentRect):
-            for subview in self.timelineView.subviews {
-                if subview.frame.minX >= segmentRect.minX {
-                    subview.frame.origin.x += segmentRect.width
-                }
-            }
-            
-            let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
-            
-            newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-            newSegmentView.clipsToBounds = true
-            
-            self.timelineView.addSubview(newSegmentView)
-            
-            break
-
-        case let .remove(segmentRect):
-            for subview in timelineView.subviews {
-                if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
-                    subview.removeFromSuperview()
-                } else if subview.frame.minX > segmentRect.maxX {
-                    subview.frame.origin.x -= segmentRect.width
-                }
-            }
-        default:
-            _ = 1
-        }
+        redoOp(op: stack[undoPos].op)
         
         updatePlayerAndTimeline()
     }
@@ -543,19 +536,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 
                 let segmentRect = CGRect(x: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.start)), y: 0, width: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.duration)), height: timelineView.frame.height)
                 
-                for subview in timelineView.subviews {
-                    if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
-                        subview.frame.size.width = scaledDurationToWidth * CGFloat(CMTimeGetSeconds(player.currentTime() - timeRangeInAsset!.start)) - 2
-                    }
-                }
-                
                 let newSegmentRect = CGRect(x: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(player.currentTime())), y: 0, width: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.end - player.currentTime())), height: timelineView.frame.height)
-                
-                let newSegmentView = UIView(frame: newSegmentRect.insetBy(dx: 1, dy: 0))
-                newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-                newSegmentView.clipsToBounds = true
-                
-                timelineView.addSubview(newSegmentView)
                 
                 push(op:.split(segmentRect, newSegmentRect))
                 
@@ -579,18 +560,6 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 
                 let segmentRect = CGRect(x: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.start)), y: 0, width: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.duration)), height: timelineView.frame.height)
                 
-                for subview in timelineView.subviews {
-                    if subview.frame.minX > segmentRect.maxX {
-                        subview.frame.origin.x += segmentRect.width
-                    }
-                }
-                
-                let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
-                newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-                newSegmentView.clipsToBounds = true
-                newSegmentView.frame.origin.x += segmentRect.width
-                timelineView.addSubview(newSegmentView)
-                
                 push(op:.copy(segmentRect))
                 
                 break
@@ -612,14 +581,6 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 try! self.composition!.removeTimeRange(timeRangeInAsset!)
                 
                 let segmentRect = CGRect(x: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.start)), y: 0, width: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.duration)), height: timelineView.frame.height)
-                
-                for subview in timelineView.subviews {
-                    if equalFrame(subview.frame, segmentRect.insetBy(dx: 1, dy: 0), digital: 0.00001) {
-                        subview.removeFromSuperview()
-                    } else if subview.frame.minX > segmentRect.maxX {
-                        subview.frame.origin.x -= segmentRect.width
-                    }
-                }
                 
                 push(op:.remove(segmentRect))
                 
