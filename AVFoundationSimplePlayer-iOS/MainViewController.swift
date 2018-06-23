@@ -215,11 +215,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
             imageGenerator?.maximumSize = CGSize(width: self.timelineView.bounds.height * 2, height: self.timelineView.bounds.height)
             
             for segment in (compositionVideoTrack?.segments)! {
-                var segmentRect = CGRect(origin: CGPoint(x:0,y:0), size: timelineView.frame.size)
-
-                segmentRect.origin.x = CGFloat(CMTimeGetSeconds(segment.timeMapping.source.start)) * scaledDurationToWidth
-                segmentRect.size.width = CGFloat(CMTimeGetSeconds(segment.timeMapping.source.duration)) * scaledDurationToWidth
-                segmentRect = segmentRect.insetBy(dx: 1, dy: 0)
+                let segmentRect = CGRect(x:CGFloat(CMTimeGetSeconds(segment.timeMapping.target.start)) * scaledDurationToWidth, y:0, width:CGFloat(CMTimeGetSeconds(segment.timeMapping.target.duration)) * scaledDurationToWidth, height:timelineView.frame.height).insetBy(dx: 1, dy: 0)
                 
                 var foundit = false
                 for subview in timelineView.subviews {
@@ -341,9 +337,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
                 
                 try! self.composition!.insertTimeRange(CMTimeRangeMake(kCMTimeZero, newAsset.duration), of: newAsset, at: kCMTimeZero)
                 
-                let newSegmentView = UIView(frame: CGRect(x: 0, y: 0, width: self.scaledDurationToWidth * CGFloat(CMTimeGetSeconds(newAsset.duration)), height: self.timelineView.frame.height))
+                let newSegmentView = UIView(frame: CGRect(x: 0, y: 0, width: self.scaledDurationToWidth * CGFloat(CMTimeGetSeconds(newAsset.duration)), height: self.timelineView.frame.height).insetBy(dx: 1, dy: 0))
                 
-                newSegmentView.frame = newSegmentView.frame.insetBy(dx: 1, dy: 0)
                 newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
                 newSegmentView.clipsToBounds = true
                 
@@ -386,7 +381,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
-            timeRangeInAsset = s.timeMapping.source // assumes non-scaled edit
+            timeRangeInAsset = s.timeMapping.target // assumes non-scaled edit
             
             if timeRangeInAsset!.containsTime(player.currentTime()) {
                 try! self.composition!.insertTimeRange(timeRangeInAsset!, of: composition!, at: timeRangeInAsset!.end)
@@ -423,10 +418,24 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
-            timeRangeInAsset = s.timeMapping.source; // assumes non-scaled edit
+            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
             
             if timeRangeInAsset!.containsTime(player.currentTime()) {
                 try! self.composition!.insertTimeRange(timeRangeInAsset!, of: composition!, at: timeRangeInAsset!.end)
+                
+                let segmentRect = CGRect(x: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.start)), y: 0, width: scaledDurationToWidth * CGFloat(CMTimeGetSeconds(timeRangeInAsset!.duration)), height: timelineView.frame.height)
+                
+                for subview in timelineView.subviews {
+                    if subview.frame.minX > segmentRect.maxX {
+                        subview.frame.origin.x += segmentRect.width
+                    }
+                }
+                
+                let newSegmentView = UIView(frame: segmentRect.insetBy(dx: 1, dy: 0))
+                newSegmentView.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+                newSegmentView.clipsToBounds = true
+                newSegmentView.frame.origin.x += segmentRect.width
+                timelineView.addSubview(newSegmentView)
                 
                 break
             }
@@ -442,7 +451,7 @@ class MainViewController: UIViewController, UIScrollViewDelegate {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
         for s in compositionVideoTrack!.segments {
-            timeRangeInAsset = s.timeMapping.source; // assumes non-scaled edit
+            timeRangeInAsset = s.timeMapping.target; // assumes non-scaled edit
             
             if timeRangeInAsset!.containsTime(player.currentTime()) {
                 try! self.composition!.removeTimeRange(timeRangeInAsset!)
