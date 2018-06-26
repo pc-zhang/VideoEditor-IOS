@@ -92,17 +92,57 @@
                                     <action selector="redo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ILB-bQ-n9R"/>
                                 </connections>
                             </button>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" directionalLockEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.050000000000000003" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TzF-TE-dY9">
-                                <rect key="frame" x="0.0" y="462" width="375" height="204"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lq8-oU-nXR" userLabel="Timeline View">
+                                <rect key="frame" x="0.0" y="531" width="375" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VLA-PF-YHN" customClass="TimelineView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="68" width="375" height="68"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="tpm-Sh-HKI">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="segment" id="9J4-qw-2uR">
+                                        <rect key="frame" x="0.0" y="9.6666666666666661" width="146" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <gestureRecognizers/>
-                                    </view>
-                                </subviews>
-                            </scrollView>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                            <rect key="frame" x="0.0" y="0.0" width="146" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mR3-xT-EBu">
+                                                    <rect key="frame" x="0.0" y="0.0" width="146" height="50"/>
+                                                    <color key="backgroundColor" red="1" green="0.4973842987" blue="0.34566883040000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="mGB-Zz-Lgt">
+                                                        <size key="itemSize" width="50" height="50"/>
+                                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                    </collectionViewFlowLayout>
+                                                    <cells>
+                                                        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="image" id="ORl-Nc-dFh">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                                <autoresizingMask key="autoresizingMask"/>
+                                                            </view>
+                                                        </collectionViewCell>
+                                                    </cells>
+                                                </collectionView>
+                                            </subviews>
+                                        </view>
+                                        <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="mR3-xT-EBu" secondAttribute="trailing" id="OX5-39-fcf"/>
+                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="leading" secondItem="9J4-qw-2uR" secondAttribute="leading" id="TFd-Y2-BaS"/>
+                                            <constraint firstAttribute="bottom" secondItem="mR3-xT-EBu" secondAttribute="bottom" id="bd2-Oy-xxt"/>
+                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="crj-0K-MEH"/>
+                                        </constraints>
+                                        <size key="customSize" width="146" height="50"/>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
@@ -112,10 +152,9 @@
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>
                         <outlet property="redoButton" destination="j12-UI-wrM" id="vzg-tt-ey7"/>
                         <outlet property="removeButton" destination="vtc-x5-voD" id="WH8-G8-57F"/>
-                        <outlet property="scrollview" destination="TzF-TE-dY9" id="Pnm-0z-r5J"/>
                         <outlet property="splitButton" destination="E8x-Q2-wzR" id="GO1-ry-AZm"/>
                         <outlet property="startTimeLabel" destination="TCk-BI-d4f" id="s5B-ja-H8I"/>
-                        <outlet property="timelineView" destination="VLA-PF-YHN" id="G7A-3r-Bz4"/>
+                        <outlet property="timelineView" destination="Lq8-oU-nXR" id="oNQ-7m-5Hn"/>
                         <outlet property="undoButton" destination="23h-j4-kPd" id="GOG-dM-LXd"/>
                         <outlet property="view" destination="8bC-Xf-vdC" id="lHD-q6-68G"/>
                     </connections>

@@ -13,7 +13,6 @@
 		D2385B4D1AF5181400DC8ADE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2385B4C1AF5181400DC8ADE /* Images.xcassets */; };
 		D27489971B1CD4E00020D82A /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27489961B1CD4E00020D82A /* PlayerView.swift */; };
 		D274899C1B1CD4EB0020D82A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D27489981B1CD4EB0020D82A /* Localizable.strings */; };
-		F02B66D920C1020700E879FE /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F02B66D820C1020700E879FE /* TimelineView.swift */; };
 		F06132E020BC4DEE000039B4 /* fullscreen.PNG in Resources */ = {isa = PBXBuildFile; fileRef = F06132DF20BC4DEE000039B4 /* fullscreen.PNG */; };
 		F06132E320BC59B4000039B4 /* pausebutton.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E120BC59B3000039B4 /* pausebutton.png */; };
 		F06132E420BC59B4000039B4 /* playbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = F06132E220BC59B4000039B4 /* playbutton.png */; };
@@ -37,7 +36,6 @@
 		D2385B511AF5181400DC8ADE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D27489961B1CD4E00020D82A /* PlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		D27489991B1CD4EB0020D82A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F02B66D820C1020700E879FE /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		F06132DF20BC4DEE000039B4 /* fullscreen.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullscreen.PNG; sourceTree = "<group>"; };
 		F06132E120BC59B3000039B4 /* pausebutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pausebutton.png; sourceTree = "<group>"; };
 		F06132E220BC59B4000039B4 /* playbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playbutton.png; sourceTree = "<group>"; };
@@ -95,7 +93,6 @@
 				F06132BC20BC1D02000039B4 /* VEResource */,
 				D20EB3C11AF94FDE0059CD72 /* MainViewController.swift */,
 				D27489961B1CD4E00020D82A /* PlayerView.swift */,
-				F02B66D820C1020700E879FE /* TimelineView.swift */,
 				D2385B491AF5181400DC8ADE /* Main.storyboard */,
 				D2385B511AF5181400DC8ADE /* Info.plist */,
 			);
@@ -247,7 +244,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D27489971B1CD4E00020D82A /* PlayerView.swift in Sources */,
-				F02B66D920C1020700E879FE /* TimelineView.swift in Sources */,
 				D2385B461AF5181400DC8ADE /* AppDelegate.swift in Sources */,
 				D20EB3C21AF94FDE0059CD72 /* MainViewController.swift in Sources */,
 			);
