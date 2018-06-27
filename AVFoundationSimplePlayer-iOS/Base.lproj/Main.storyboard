@@ -93,7 +93,7 @@
                                     <action selector="redo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ILB-bQ-n9R"/>
                                 </connections>
                             </button>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.25" bouncesZoom="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lq8-oU-nXR" userLabel="Timeline View">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.25" maximumZoomScale="2" bouncesZoom="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lq8-oU-nXR" userLabel="Timeline View">
                                 <rect key="frame" x="0.0" y="531" width="375" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -111,9 +111,9 @@
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mR3-xT-EBu">
-                                                    <rect key="frame" x="0.0" y="0.0" width="146" height="50"/>
-                                                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mR3-xT-EBu">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="mGB-Zz-Lgt">
                                                         <size key="itemSize" width="50" height="50"/>
                                                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -133,14 +133,12 @@
                                                 </collectionView>
                                             </subviews>
                                         </view>
-                                        <color key="backgroundColor" red="1" green="0.4973842987" blue="0.34566883040000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="bottom" secondItem="Lq8-oU-nXR" secondAttribute="bottom" id="8KC-zg-ln4"/>
-                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="leading" secondItem="9J4-qw-2uR" secondAttribute="leading" id="BiY-3x-Ha7"/>
-                                            <constraint firstItem="Lq8-oU-nXR" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="UQo-j6-dbP"/>
-                                            <constraint firstAttribute="trailing" secondItem="mR3-xT-EBu" secondAttribute="trailing" id="XFi-qx-tB1"/>
-                                            <constraint firstAttribute="bottom" secondItem="mR3-xT-EBu" secondAttribute="bottom" id="hmA-1y-Anm"/>
-                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="yzf-Ab-PNL"/>
+                                            <constraint firstAttribute="bottom" secondItem="mR3-xT-EBu" secondAttribute="bottom" id="0ed-9n-Lvq"/>
+                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="4KX-A8-S0H"/>
+                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="leading" secondItem="9J4-qw-2uR" secondAttribute="leading" id="LY2-7H-uaF"/>
+                                            <constraint firstAttribute="trailing" secondItem="mR3-xT-EBu" secondAttribute="trailing" id="jFZ-jW-03e"/>
                                         </constraints>
                                     </collectionViewCell>
                                 </cells>

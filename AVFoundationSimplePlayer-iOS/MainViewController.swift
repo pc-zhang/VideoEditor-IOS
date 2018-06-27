@@ -19,8 +19,9 @@ private var MainViewControllerKVOContext = 0
 class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func pinch(_ recognizer: UIPinchGestureRecognizer) {
-        visibleTimeRange = 30*timelineView.zoomScale
-        currentTime = zoomCurrentTime
+        visibleTimeRange = 30 * timelineView.zoomScale
+        timelineView.collectionViewLayout.invalidateLayout()
+        timelineView.contentOffset.x = CGFloat(self.currentTime/CMTimeGetSeconds(self.composition!.duration)*Double(self.timelineView.frame.width)) - self.timelineView.frame.size.width/2
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -45,7 +46,7 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
         
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
-        if false {
+        if true {
             var times = [NSValue]()
             
             let timerange = (compositionVideoTrack?.segments[indexPath.item].timeMapping.target)!
@@ -82,9 +83,8 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
     
     // MARK: Properties
     
-    var emptyView: UIView = UIView(frame: CGRect.zero)
+    var emptyView = UIView(frame: CGRect.zero)
     var seekTimer: Timer? = nil
-    var lastCenterTime: Double = 0
     var visibleTimeRange: CGFloat = 30
     var scaledDurationToWidth: CGFloat {
         return timelineView.frame.width / visibleTimeRange
@@ -206,10 +206,7 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
             timelineView.dataSource = self
             timelineView.contentOffset = CGPoint(x:-timelineView.frame.width / 2, y:0)
             timelineView.contentInset = UIEdgeInsets(top: 0, left: timelineView.frame.width/2, bottom: 0, right: timelineView.frame.width/2)
-//            emptyView.backgroundColor = #colorLiteral(red: 1, green: 0.313680788, blue: 0.3196314173, alpha: 0)
-//            emptyView.frame.origin = CGPoint.zero
-//            emptyView.frame.size = timelineView.frame.size
-//            timelineView.addSubview(emptyView)
+            timelineView.addSubview(emptyView)
 //            timelineView.pinchGestureRecognizer?.addTarget(self, action: #selector(MainViewController.pinch))
         }
     }
@@ -285,9 +282,7 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
         player.replaceCurrentItem(with: playerItem)
         
         currentTime = Double((timelineView.contentOffset.x + timelineView.frame.width/2) / scaledDurationToWidth)
-        
-        lastCenterTime = currentTime
-        
+
     }
     
     // MARK: - IBActions
@@ -692,10 +687,10 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
     }
     
     // MARK: Delegate
-
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return scrollView.subviews.first
-    }
+    
+//    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+//        return emptyView
+//    }
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
         zoomCurrentTime = currentTime
