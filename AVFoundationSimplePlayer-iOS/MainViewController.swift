@@ -16,8 +16,12 @@ import UIKit
  */
 private var MainViewControllerKVOContext = 0
 
-class MainViewController: UIViewController, UIScrollViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
+    func pinch(_ recognizer: UIPinchGestureRecognizer) {
+        visibleTimeRange = 30*timelineView.zoomScale
+        currentTime = zoomCurrentTime
+    }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
@@ -37,11 +41,11 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        let segmentView = collectionView.dequeueReusableCell(withReuseIdentifier: "segment", for: indexPath)
+        let segmentView = collectionView.dequeueReusableCell(withReuseIdentifier: "segment", for: indexPath) 
         
         let compositionVideoTrack = self.composition!.tracks(withMediaType: AVMediaTypeVideo).first
         
-        if true {
+        if false {
             var times = [NSValue]()
             
             let timerange = (compositionVideoTrack?.segments[indexPath.item].timeMapping.target)!
@@ -78,11 +82,12 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UICollectionVi
     
     // MARK: Properties
     
+    var emptyView: UIView = UIView(frame: CGRect.zero)
     var seekTimer: Timer? = nil
     var lastCenterTime: Double = 0
+    var visibleTimeRange: CGFloat = 30
     var scaledDurationToWidth: CGFloat {
-        return timelineView.frame.width / 30
-
+        return timelineView.frame.width / visibleTimeRange
     }
     var imageGenerator: AVAssetImageGenerator? = nil
     struct opsAndComps {
@@ -133,6 +138,8 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UICollectionVi
     ]
     
     let player = AVPlayer()
+    
+    var zoomCurrentTime: Double = 0
     
     var currentTime: Double {
         get {
@@ -197,12 +204,13 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UICollectionVi
         didSet {
             timelineView.delegate = self
             timelineView.dataSource = self
-//            timelineView.autoresizingMask = [.flexibleWidth]
-//            timelineView.layout
-            timelineView.backgroundColor = #colorLiteral(red: 1, green: 0, blue: 0, alpha: 0)
             timelineView.contentOffset = CGPoint(x:-timelineView.frame.width / 2, y:0)
             timelineView.contentInset = UIEdgeInsets(top: 0, left: timelineView.frame.width/2, bottom: 0, right: timelineView.frame.width/2)
-            
+//            emptyView.backgroundColor = #colorLiteral(red: 1, green: 0.313680788, blue: 0.3196314173, alpha: 0)
+//            emptyView.frame.origin = CGPoint.zero
+//            emptyView.frame.size = timelineView.frame.size
+//            timelineView.addSubview(emptyView)
+//            timelineView.pinchGestureRecognizer?.addTarget(self, action: #selector(MainViewController.pinch))
         }
     }
     
@@ -686,7 +694,11 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UICollectionVi
     // MARK: Delegate
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return nil
+        return scrollView.subviews.first
+    }
+    
+    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
+        zoomCurrentTime = currentTime
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

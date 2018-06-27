@@ -24,6 +24,7 @@
                             <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" insetsLayoutMarginsFromSafeArea="NO" image="background.png" translatesAutoresizingMaskIntoConstraints="NO" id="5Rv-fs-F4o">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <autoresizingMask key="autoresizingMask"/>
+                                <gestureRecognizers/>
                             </imageView>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k2B-HR-6u1" customClass="PlayerView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="167" width="375" height="172"/>
@@ -92,10 +93,10 @@
                                     <action selector="redo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ILB-bQ-n9R"/>
                                 </connections>
                             </button>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lq8-oU-nXR" userLabel="Timeline View">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.25" bouncesZoom="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lq8-oU-nXR" userLabel="Timeline View">
                                 <rect key="frame" x="0.0" y="531" width="375" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="tpm-Sh-HKI">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -103,16 +104,16 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="segment" id="9J4-qw-2uR">
-                                        <rect key="frame" x="0.0" y="9.6666666666666661" width="146" height="50"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="segment" id="9J4-qw-2uR" customClass="SegmentView" customModule="AVFoundationSimplePlayer_Swift" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="9.6666666666666661" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
-                                            <rect key="frame" x="0.0" y="0.0" width="146" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mR3-xT-EBu">
+                                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mR3-xT-EBu">
                                                     <rect key="frame" x="0.0" y="0.0" width="146" height="50"/>
-                                                    <color key="backgroundColor" red="1" green="0.4973842987" blue="0.34566883040000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="mGB-Zz-Lgt">
                                                         <size key="itemSize" width="50" height="50"/>
                                                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -132,14 +133,15 @@
                                                 </collectionView>
                                             </subviews>
                                         </view>
-                                        <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="1" green="0.4973842987" blue="0.34566883040000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="trailing" secondItem="mR3-xT-EBu" secondAttribute="trailing" id="OX5-39-fcf"/>
-                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="leading" secondItem="9J4-qw-2uR" secondAttribute="leading" id="TFd-Y2-BaS"/>
-                                            <constraint firstAttribute="bottom" secondItem="mR3-xT-EBu" secondAttribute="bottom" id="bd2-Oy-xxt"/>
-                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="crj-0K-MEH"/>
+                                            <constraint firstAttribute="bottom" secondItem="Lq8-oU-nXR" secondAttribute="bottom" id="8KC-zg-ln4"/>
+                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="leading" secondItem="9J4-qw-2uR" secondAttribute="leading" id="BiY-3x-Ha7"/>
+                                            <constraint firstItem="Lq8-oU-nXR" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="UQo-j6-dbP"/>
+                                            <constraint firstAttribute="trailing" secondItem="mR3-xT-EBu" secondAttribute="trailing" id="XFi-qx-tB1"/>
+                                            <constraint firstAttribute="bottom" secondItem="mR3-xT-EBu" secondAttribute="bottom" id="hmA-1y-Anm"/>
+                                            <constraint firstItem="mR3-xT-EBu" firstAttribute="top" secondItem="9J4-qw-2uR" secondAttribute="top" id="yzf-Ab-PNL"/>
                                         </constraints>
-                                        <size key="customSize" width="146" height="50"/>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
