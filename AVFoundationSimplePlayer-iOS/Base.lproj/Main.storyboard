@@ -143,10 +143,19 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CWn-zH-r57">
+                                <rect key="frame" x="326" y="550" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Add"/>
+                                <connections>
+                                    <action selector="AddVideo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="oCw-4K-EHN"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <connections>
+                        <outlet property="cameraButton" destination="CWn-zH-r57" id="OUv-0I-q0b"/>
                         <outlet property="copyButton" destination="SV9-cG-1eW" id="gTU-ag-yzK"/>
                         <outlet property="playPauseButton" destination="oXx-Rg-8cj" id="cVr-Vl-Xgy"/>
                         <outlet property="playerView" destination="k2B-HR-6u1" id="w2i-er-gei"/>

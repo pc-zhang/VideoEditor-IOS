@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import UIKit
+import MobileCoreServices
 
 /*
  KVO context used to differentiate KVO callbacks for this class versus other
@@ -16,7 +17,35 @@ import UIKit
  */
 private var MainViewControllerKVOContext = 0
 
-class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    // MARK: camera
+    
+    @IBOutlet weak var cameraButton: UIButton! {
+        didSet {
+            cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum)
+        }
+    }
+    
+    @IBAction func AddVideo(_ sender: UIButton) {
+        let picker = UIImagePickerController()
+        picker.sourceType = .savedPhotosAlbum
+        picker.mediaTypes = [kUTTypeMovie as String]
+        picker.delegate = self
+        picker.allowsEditing = false
+        present(picker, animated: true)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.presentingViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let videoURL = info[UIImagePickerControllerMediaURL] as? URL {
+            addClip(videoURL)
+        }
+        picker.presentingViewController?.dismiss(animated: true, completion: nil)
+    }
     
     func pinch(_ recognizer: UIPinchGestureRecognizer) {
         visibleTimeRange = 30 * timelineView.zoomScale
@@ -244,14 +273,13 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
         }
         
         // add composition
-        
-        composition = AVMutableComposition()
-        // Add two video tracks and two audio tracks.
-        _ = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
-        
-        _ = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
-        
-        addClip()
+        if composition==nil {
+            composition = AVMutableComposition()
+            // Add two video tracks and two audio tracks.
+            _ = composition!.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
+            
+            _ = composition!.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -287,8 +315,7 @@ class MainViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
     
     // MARK: - IBActions
     
-    func addClip() {
-        let movieURL = Bundle.main.url(forResource: "wallstreet", withExtension: "mov")!
+    func addClip(_ movieURL: URL) {
         let newAsset = AVURLAsset(url: movieURL, options: nil)
         /*
          Using AVAsset now runs the risk of blocking the current thread (the
